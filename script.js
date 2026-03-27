@@ -125,7 +125,7 @@ async function fetchPlayer() {
         trophies: data.history.map(h => h[1]),
         wins3v3:  data.history.map(h => h[2]),
         winsSolo: data.history.map(h => h[3]),
-        prestige: data.history.map(h => h[4]),
+        prestigeLvl: data.history.map(h => h[4]),
       };
       chartSec.style.display = "block";
       // reset tabs
@@ -183,7 +183,7 @@ const CHART_CONFIG = {
   trophies: { label: "Copas",        color: "#00d4ff" },
   wins3v3:  { label: "Victorias 3v3", color: "#0099ff" },
   winsSolo: { label: "Victorias Solo", color: "#6655ff" },
-  prestige: { label: "Prestige",      color: "#00e899" },
+  prestigeLvl: { label: "Prestige",    color: "#00e899" },
 };
 
 function renderChart(key) {
