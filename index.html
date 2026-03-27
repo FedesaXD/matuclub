@@ -1,25 +1,24 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Brawl Tracker</title>
+  <title>Brawl Tracker</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>🎮 Brawl Tracker</h1>
 
-    <input type="text" id="tag" placeholder="#PLAYER_TAG">
-    <button onclick="buscar()">Buscar</button>
+  <h1>🏆 Brawl Tracker</h1>
 
-    <pre id="resultado"></pre>
+  <div class="search">
+    <input type="text" id="playerTag" placeholder="Enter player tag">
+    <button onclick="fetchPlayer()">Buscar</button>
+  </div>
 
-    <script>
-        async function buscar() {
-            const tag = document.getElementById("tag").value;
+  <div id="playerInfo"></div>
 
-            const res = await fetch("https://TU_BACKEND/player/" + tag);
-            const data = await res.json();
+  <h2>Top Prestige</h2>
+  <button onclick="fetchTopPrestige()">Cargar ranking</button>
+  <div id="topPrestige"></div>
 
-            document.getElementById("resultado").textContent = JSON.stringify(data, null, 2);
-        }
-    </script>
+  <script src="script.js"></script>
 </body>
 </html>
