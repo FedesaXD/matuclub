@@ -5,12 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Matuclub Tracker</title>
   <link rel="stylesheet" href="style.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet"/>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
-  <!-- BACKGROUND ORBS -->
   <div class="bg-orb orb-1"></div>
   <div class="bg-orb orb-2"></div>
   <div class="bg-orb orb-3"></div>
@@ -18,10 +17,9 @@
   <!-- HOME -->
   <div id="home" class="view active">
     <div class="hero">
-      <div class="badge">BRAWL STARS</div>
-      <h1>Matuclub<br><span>Tracker</span></h1>
+      <div class="badge">MATUCLUB · BRAWL STARS</div>
+      <h1>Club<br><span>Tracker</span></h1>
       <p class="subtitle">Estadísticas en tiempo real del club</p>
-
       <nav class="nav-cards">
         <button class="nav-card" onclick="showView('prestige')">
           <div class="nav-card-icon">🏆</div>
@@ -31,16 +29,14 @@
           </div>
           <div class="nav-card-arrow">→</div>
         </button>
-
         <button class="nav-card" onclick="showView('player')">
           <div class="nav-card-icon">👤</div>
           <div class="nav-card-body">
             <span class="nav-card-title">Buscar Jugador</span>
-            <span class="nav-card-desc">Estadísticas e historial</span>
+            <span class="nav-card-desc">Stats, historial y brawlers</span>
           </div>
           <div class="nav-card-arrow">→</div>
         </button>
-
         <button class="nav-card" onclick="showView('brawler')">
           <div class="nav-card-icon">🤖</div>
           <div class="nav-card-body">
@@ -56,55 +52,61 @@
   <!-- TOP PRESTIGE -->
   <div id="prestige" class="view">
     <header class="page-header">
-      <button class="back-btn" onclick="showView('home')">
-        <span>←</span> Volver
-      </button>
-      <h2>Top Prestige</h2>
+      <button class="back-btn" onclick="showView('home')"><span>←</span> Volver</button>
+      <h2>🏆 Top Prestige</h2>
     </header>
     <div class="content-area">
-      <div id="prestigeList" class="table-wrapper">
-        <div class="loading">Cargando datos…</div>
-      </div>
+      <div id="prestigeList"><div class="loading">Cargando ranking…</div></div>
     </div>
   </div>
 
   <!-- PLAYER -->
   <div id="player" class="view">
     <header class="page-header">
-      <button class="back-btn" onclick="showView('home')">
-        <span>←</span> Volver
-      </button>
-      <h2>Buscar Jugador</h2>
+      <button class="back-btn" onclick="showView('home')"><span>←</span> Volver</button>
+      <h2>👤 Buscar Jugador</h2>
     </header>
     <div class="content-area">
       <div class="search-bar">
         <input id="playerTag" placeholder="#PLAYERTAG" />
         <button class="search-btn" onclick="fetchPlayer()">Buscar</button>
       </div>
-
-      <div id="playerData"></div>
-
-      <div id="chartWrapper" class="chart-wrapper" style="display:none">
-        <h3 class="chart-title">Historial</h3>
-        <canvas id="chart"></canvas>
+      <div id="playerProfile"></div>
+      <div id="chartSection" style="display:none">
+        <div class="section-header">
+          <h3 class="section-title">Progreso</h3>
+          <div class="tab-group">
+            <button class="tab active" onclick="switchTab('trophies',this)">Copas</button>
+            <button class="tab" onclick="switchTab('wins3v3',this)">Victorias 3v3</button>
+            <button class="tab" onclick="switchTab('winsSolo',this)">Solo</button>
+            <button class="tab" onclick="switchTab('prestige',this)">Prestige</button>
+          </div>
+        </div>
+        <div class="chart-card">
+          <canvas id="chart"></canvas>
+        </div>
+      </div>
+      <div id="brawlersSection" style="display:none">
+        <div class="section-header">
+          <h3 class="section-title">Top 10 Brawlers</h3>
+        </div>
+        <div id="brawlerGrid" class="brawler-grid"></div>
       </div>
     </div>
   </div>
 
-  <!-- BRAWLER -->
+  <!-- BRAWLER TOP -->
   <div id="brawler" class="view">
     <header class="page-header">
-      <button class="back-btn" onclick="showView('home')">
-        <span>←</span> Volver
-      </button>
-      <h2>Top Brawler</h2>
+      <button class="back-btn" onclick="showView('home')"><span>←</span> Volver</button>
+      <h2>🤖 Top Brawler</h2>
     </header>
     <div class="content-area">
       <div class="search-bar">
         <input id="brawlerName" placeholder="Nombre del brawler…" />
         <button class="search-btn" onclick="fetchBrawler()">Buscar</button>
       </div>
-      <div id="brawlerList" class="table-wrapper"></div>
+      <div id="brawlerList"></div>
     </div>
   </div>
 

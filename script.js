@@ -1,217 +1,301 @@
 const API = "https://thereafter-matthew-closure-grass.trycloudflare.com";
 
-/* ─── NAVIGATION ─────────────────────────────────────── */
+// Brawlify CDN para imágenes de brawlers
+const BRAWLIFY = "https://cdn.brawlify.com/brawler-bs";
+
+/* ─── UTILS ──────────────────────────────────────────── */
 function showView(id) {
   document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
   document.getElementById(id).classList.add("active");
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
+function fmt(n) {
+  return Number(n).toLocaleString("es-UY");
+}
+
+// Convierte nombre de brawler a slug para imagen
+// ej: "BULL" -> "Bull", "EL PRIMO" -> "El-Primo"
+function brawlerSlug(name) {
+  return name
+    .toLowerCase()
+    .split(" ")
+    .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+    .join("-");
+}
+
+function brawlerImgUrl(name) {
+  return `${BRAWLIFY}/${brawlerSlug(name)}.png`;
+}
+
 /* ─── TOP PRESTIGE ───────────────────────────────────── */
 async function fetchPrestige() {
   const container = document.getElementById("prestigeList");
-  container.innerHTML = `<div class="loading">Cargando ranking…</div>`;
-
+  container.innerHTML = `<div class="loading">Cargando ranking</div>`;
   try {
     const res  = await fetch(`${API}/top/prestige`);
     const data = await res.json();
-
-    let rows = data.map(p => `
+    const rows = data.map(p => `
       <tr>
         <td>${p.rank}</td>
         <td>${p.name}</td>
-        <td>${p.prestige.toLocaleString()}</td>
+        <td>${fmt(p.prestige)}</td>
       </tr>
     `).join("");
-
     container.innerHTML = `
-      <table>
-        <thead><tr><th>#</th><th>Jugador</th><th>Prestige</th></tr></thead>
-        <tbody>${rows}</tbody>
-      </table>
-    `;
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>#</th><th>Jugador</th><th>Prestige</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>`;
   } catch {
-    container.innerHTML = `<div class="loading">Error al cargar datos.</div>`;
+    container.innerHTML = `<div class="loading">Error al cargar datos</div>`;
   }
 }
-
 document.getElementById("prestige").addEventListener("click", fetchPrestige);
 
-/* ─── PLAYER SEARCH ──────────────────────────────────── */
+/* ─── PLAYER ─────────────────────────────────────────── */
 let chart;
+let historyData = {}; // { trophies[], wins3v3[], winsSolo[], prestige[], labels[] }
 
 async function fetchPlayer() {
   let tag = document.getElementById("playerTag").value.trim();
   if (!tag) return;
   if (!tag.startsWith("#")) tag = "#" + tag;
 
-  const dataEl    = document.getElementById("playerData");
-  const chartWrap = document.getElementById("chartWrapper");
+  const profileEl   = document.getElementById("playerProfile");
+  const chartSec    = document.getElementById("chartSection");
+  const brawlersSec = document.getElementById("brawlersSection");
 
-  dataEl.innerHTML = `<div class="loading">Buscando jugador…</div>`;
-  chartWrap.style.display = "none";
+  profileEl.innerHTML = `<div class="loading">Buscando jugador</div>`;
+  chartSec.style.display    = "none";
+  brawlersSec.style.display = "none";
 
   try {
     const res  = await fetch(`${API}/player/${encodeURIComponent(tag)}`);
     const data = await res.json();
 
     if (data.error) {
-      dataEl.innerHTML = `<div class="loading">Jugador no encontrado.</div>`;
+      profileEl.innerHTML = `<div class="loading">Jugador no encontrado</div>`;
       return;
     }
 
-    dataEl.innerHTML = `
-      <div class="player-card">
-        <div class="player-card-name">${data.name}</div>
-        <div class="stat-item">
-          <span class="stat-label">Trofeos máximos</span>
-          <span class="stat-value">${data.highest_trophies.toLocaleString()}</span>
+    // ── Profile card ──────────────────────────────────
+    profileEl.innerHTML = `
+      <div class="profile-card">
+        <div class="profile-top">
+          <div>
+            <div class="profile-name">${data.name}</div>
+            <div class="profile-club">${data.club_tag || "Sin club"}</div>
+          </div>
+          <div class="winstreak-badge">
+            <div class="ws-label">Mejor racha</div>
+            <div class="ws-val">🔥 ${data.best_winstreak.value}</div>
+            <div class="ws-brawler">${data.best_winstreak.brawler}</div>
+          </div>
         </div>
-        <div class="stat-item">
-          <span class="stat-label">Prestige total</span>
-          <span class="stat-value">${data.total_prestige.toLocaleString()}</span>
+        <div class="stats-grid">
+          <div class="stat-box">
+            <div class="stat-label">Trofeos máximos</div>
+            <div class="stat-val"><span class="stat-icon">🏆</span>${fmt(data.highest_trophies)}</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-label">Prestige total</div>
+            <div class="stat-val"><span class="stat-icon">✨</span>${fmt(data.total_prestige)}</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-label">Victorias 3v3</div>
+            <div class="stat-val"><span class="stat-icon">🎮</span>${fmt(data.wins3v3)}</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-label">Victorias Solo</div>
+            <div class="stat-val"><span class="stat-icon">⚔️</span>${fmt(data.winsSolo)}</div>
+          </div>
         </div>
-        <div class="stat-item">
-          <span class="stat-label">Victorias 3v3</span>
-          <span class="stat-value">${data.wins3v3.toLocaleString()}</span>
-        </div>
-      </div>
-    `;
+      </div>`;
 
-    // Chart
-    const labels   = data.history.map(h => h[0]);
-    const trophies = data.history.map(h => h[1]);
-    const wins3v3  = data.history.map(h => h[2]);
-    const solo     = data.history.map(h => h[3]);
+    // ── History chart ──────────────────────────────────
+    if (data.history && data.history.length > 1) {
+      historyData = {
+        labels:   data.history.map(h => {
+          const d = new Date(h[0]);
+          return `${d.getDate()}/${d.getMonth()+1} ${d.getHours()}:${String(d.getMinutes()).padStart(2,'0')}`;
+        }),
+        trophies: data.history.map(h => h[1]),
+        wins3v3:  data.history.map(h => h[2]),
+        winsSolo: data.history.map(h => h[3]),
+        prestige: data.history.map(h => h[4]),
+      };
+      chartSec.style.display = "block";
+      // reset tabs
+      document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+      document.querySelector(".tab").classList.add("active");
+      renderChart("trophies");
+    }
 
-    if (chart) chart.destroy();
+    // ── Brawler grid ───────────────────────────────────
+    if (data.top_brawlers && data.top_brawlers.length > 0) {
+      brawlersSec.style.display = "block";
+      const grid = document.getElementById("brawlerGrid");
+      grid.innerHTML = data.top_brawlers.map(b => {
+        const [bName, power, gadgets, stars, hyper, trophies] = b;
+        const name = bName.toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
+        const imgUrl = brawlerImgUrl(bName);
 
-    const ctx = document.getElementById("chart");
+        const gadgetPills  = gadgets > 0
+          ? `<span class="attr-pill attr-gadget">⚙️ ${gadgets}</span>` : "";
+        const starPills    = stars > 0
+          ? `<span class="attr-pill attr-star">⭐ ${stars}</span>` : "";
+        const hyperPills   = hyper > 0
+          ? `<span class="attr-pill attr-hyper">⚡ HC</span>` : "";
 
-    Chart.defaults.color = "#5a7a9e";
-    Chart.defaults.font.family = "'DM Sans', sans-serif";
+        return `
+          <div class="brawler-card">
+            <div class="brawler-img-wrap">
+              <img
+                src="${imgUrl}"
+                alt="${name}"
+                onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"
+              />
+              <div class="brawler-img-placeholder" style="display:none">${name}</div>
+              <div class="brawler-power">P${power}</div>
+              <div class="brawler-trophies">🏆 ${fmt(trophies)}</div>
+            </div>
+            <div class="brawler-info">
+              <div class="brawler-name">${name}</div>
+              <div class="brawler-attrs">
+                ${gadgetPills}${starPills}${hyperPills}
+              </div>
+            </div>
+          </div>`;
+      }).join("");
+    }
 
-    chart = new Chart(ctx, {
-      type: "line",
-      data: {
-        labels,
-        datasets: [
-          {
-            label: "Trophies",
-            data: trophies,
-            borderColor: "#00d4ff",
-            backgroundColor: "rgba(0,212,255,0.08)",
-            borderWidth: 2,
-            pointRadius: 3,
-            pointBackgroundColor: "#00d4ff",
-            tension: 0.4,
-            fill: true,
-          },
-          {
-            label: "3v3 Wins",
-            data: wins3v3,
-            borderColor: "#0057ff",
-            backgroundColor: "rgba(0,87,255,0.08)",
-            borderWidth: 2,
-            pointRadius: 3,
-            pointBackgroundColor: "#0057ff",
-            tension: 0.4,
-            fill: true,
-          },
-          {
-            label: "Solo Wins",
-            data: solo,
-            borderColor: "#00b4ff",
-            backgroundColor: "rgba(0,180,255,0.06)",
-            borderWidth: 2,
-            pointRadius: 3,
-            pointBackgroundColor: "#00b4ff",
-            tension: 0.4,
-            fill: true,
-          },
-        ],
-      },
-      options: {
-        responsive: true,
-        plugins: {
-          legend: {
-            labels: {
-              color: "#5a7a9e",
-              boxWidth: 12,
-              padding: 20,
-            },
-          },
-          tooltip: {
-            backgroundColor: "#071222",
-            borderColor: "rgba(255,255,255,0.07)",
-            borderWidth: 1,
-            titleColor: "#e8f0fe",
-            bodyColor: "#5a7a9e",
-            padding: 12,
-          },
-        },
-        scales: {
-          x: {
-            grid: { color: "rgba(255,255,255,0.04)" },
-            ticks: { color: "#5a7a9e" },
-          },
-          y: {
-            grid: { color: "rgba(255,255,255,0.04)" },
-            ticks: { color: "#5a7a9e" },
-          },
-        },
-      },
-    });
-
-    chartWrap.style.display = "block";
-
-  } catch {
-    dataEl.innerHTML = `<div class="loading">Error al cargar jugador.</div>`;
+  } catch(e) {
+    profileEl.innerHTML = `<div class="loading">Error al cargar jugador</div>`;
+    console.error(e);
   }
 }
 
-// Allow Enter key on input
-document.getElementById("playerTag").addEventListener("keydown", e => {
-  if (e.key === "Enter") fetchPlayer();
-});
+/* ─── CHART RENDERING ────────────────────────────────── */
+const CHART_CONFIG = {
+  trophies: { label: "Copas",        color: "#00d4ff" },
+  wins3v3:  { label: "Victorias 3v3", color: "#0099ff" },
+  winsSolo: { label: "Victorias Solo", color: "#6655ff" },
+  prestige: { label: "Prestige",      color: "#00e899" },
+};
+
+function renderChart(key) {
+  const { label, color } = CHART_CONFIG[key];
+  const ctx = document.getElementById("chart");
+
+  if (chart) chart.destroy();
+
+  Chart.defaults.color = "#4a6a85";
+  Chart.defaults.font.family = "'DM Sans', sans-serif";
+
+  chart = new Chart(ctx, {
+    type: "line",
+    data: {
+      labels: historyData.labels,
+      datasets: [{
+        label,
+        data: historyData[key],
+        borderColor: color,
+        backgroundColor: hexAlpha(color, 0.08),
+        borderWidth: 2,
+        pointRadius: 3,
+        pointBackgroundColor: color,
+        pointBorderColor: "transparent",
+        tension: 0.4,
+        fill: true,
+      }]
+    },
+    options: {
+      responsive: true,
+      interaction: { mode: "index", intersect: false },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: "#07111f",
+          borderColor: "rgba(0,160,255,0.2)",
+          borderWidth: 1,
+          titleColor: "#ddeeff",
+          bodyColor: "#4a6a85",
+          padding: 12,
+          callbacks: {
+            label: ctx => `${label}: ${fmt(ctx.parsed.y)}`
+          }
+        }
+      },
+      scales: {
+        x: {
+          grid: { color: "rgba(255,255,255,0.04)", drawBorder: false },
+          ticks: { color: "#4a6a85", maxTicksLimit: 8, maxRotation: 0 },
+        },
+        y: {
+          grid: { color: "rgba(255,255,255,0.04)", drawBorder: false },
+          ticks: { color: "#4a6a85", callback: v => fmt(v) },
+        }
+      }
+    }
+  });
+}
+
+function switchTab(key, el) {
+  document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+  el.classList.add("active");
+  renderChart(key);
+}
+
+function hexAlpha(hex, alpha) {
+  const r = parseInt(hex.slice(1,3),16);
+  const g = parseInt(hex.slice(3,5),16);
+  const b = parseInt(hex.slice(5,7),16);
+  return `rgba(${r},${g},${b},${alpha})`;
+}
 
 /* ─── BRAWLER TOP ────────────────────────────────────── */
 async function fetchBrawler() {
   const name      = document.getElementById("brawlerName").value.trim();
   const container = document.getElementById("brawlerList");
-
   if (!name) return;
 
-  container.innerHTML = `<div class="loading">Buscando brawler…</div>`;
-
+  container.innerHTML = `<div class="loading">Buscando brawler</div>`;
   try {
     const res  = await fetch(`${API}/top/brawler/${encodeURIComponent(name)}`);
     const data = await res.json();
 
     if (data.error) {
-      container.innerHTML = `<div class="loading">No hay datos para este brawler.</div>`;
+      container.innerHTML = `<div class="loading">No hay datos para este brawler</div>`;
       return;
     }
 
-    let rows = data.map(p => `
+    const rows = data.map(p => `
       <tr>
         <td>${p.rank}</td>
         <td>${p.name}</td>
-        <td>${p.trophies.toLocaleString()}</td>
+        <td>${fmt(p.trophies)}</td>
       </tr>
     `).join("");
 
     container.innerHTML = `
-      <table>
-        <thead><tr><th>#</th><th>Jugador</th><th>Trofeos</th></tr></thead>
-        <tbody>${rows}</tbody>
-      </table>
-    `;
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>#</th><th>Jugador</th><th>Trofeos</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>`;
   } catch {
-    container.innerHTML = `<div class="loading">Error al cargar datos.</div>`;
+    container.innerHTML = `<div class="loading">Error al cargar datos</div>`;
   }
 }
 
+/* ─── KEYBOARD SHORTCUTS ─────────────────────────────── */
+document.getElementById("playerTag").addEventListener("keydown", e => {
+  if (e.key === "Enter") fetchPlayer();
+});
 document.getElementById("brawlerName").addEventListener("keydown", e => {
   if (e.key === "Enter") fetchBrawler();
 });
