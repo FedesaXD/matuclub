@@ -6,19 +6,47 @@
 </head>
 <body>
 
-  <h1>🏆 Brawl Tracker</h1>
+<header>
+  <h1>📊 Brawl Tracker</h1>
+</header>
 
-  <div class="search">
-    <input type="text" id="playerTag" placeholder="Enter player tag">
-    <button onclick="fetchPlayer()">Buscar</button>
+<div class="container">
+
+  <!-- PLAYER CARD -->
+  <div class="card player">
+    <h2 id="name">Player</h2>
+    <p id="tag">#TAG</p>
   </div>
 
-  <div id="playerInfo"></div>
+  <!-- STATS -->
+  <div class="card stats">
+    <div class="stat">
+      <span>🏆 Trophies</span>
+      <h3 id="trophies">0</h3>
+    </div>
+    <div class="stat">
+      <span>✨ Prestige</span>
+      <h3 id="prestige">0</h3>
+    </div>
+    <div class="stat">
+      <span>🎮 3v3 Wins</span>
+      <h3 id="wins">0</h3>
+    </div>
+  </div>
 
-  <h2>Top Prestige</h2>
-  <button onclick="fetchTopPrestige()">Cargar ranking</button>
-  <div id="topPrestige"></div>
+  <!-- BRAWLERS -->
+  <div class="card">
+    <h2>Top Brawlers</h2>
+    <div id="brawlers" class="grid"></div>
+  </div>
 
-  <script src="script.js"></script>
+</div>
+
+<div class="search">
+  <input id="playerTag" placeholder="Player tag">
+  <button onclick="fetchPlayer()">Buscar</button>
+</div>
+
+<script src="script.js"></script>
 </body>
 </html>

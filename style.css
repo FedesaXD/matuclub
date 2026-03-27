@@ -1,44 +1,83 @@
 body {
-    font-family: Arial;
-    background: #121212;
+    margin: 0;
+    font-family: "Segoe UI", sans-serif;
+    background: radial-gradient(circle at top, #1a1a1a, #0a0a0a);
     color: white;
-    text-align: center;
   }
   
-  h1 {
+  header {
+    padding: 20px;
+    text-align: center;
+    border-bottom: 1px solid #222;
+  }
+  
+  .container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    padding: 20px;
+  }
+  
+  .card {
+    background: linear-gradient(145deg, #111, #1b1b1b);
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 0 20px rgba(0,255,200,0.05);
+  }
+  
+  .player h2 {
+    margin: 0;
+  }
+  
+  .player p {
+    color: #aaa;
+  }
+  
+  .stats {
+    display: flex;
+    justify-content: space-around;
+  }
+  
+  .stat h3 {
+    margin: 5px 0;
     color: #00ffcc;
   }
   
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 10px;
+  }
+  
+  .brawler {
+    background: #222;
+    border-radius: 10px;
+    padding: 10px;
+    text-align: center;
+    transition: 0.2s;
+  }
+  
+  .brawler:hover {
+    transform: scale(1.05);
+    background: #2a2a2a;
+  }
+  
   .search {
+    text-align: center;
     margin: 20px;
   }
   
   input {
     padding: 10px;
-    font-size: 16px;
+    border-radius: 8px;
+    border: none;
   }
   
   button {
     padding: 10px;
+    margin-left: 10px;
     background: #00ffcc;
     border: none;
+    border-radius: 8px;
     cursor: pointer;
-  }
-  
-  .card {
-    background: #1e1e1e;
-    padding: 20px;
-    margin: 20px auto;
-    width: 300px;
-    border-radius: 10px;
-  }
-  
-  table {
-    margin: auto;
-    border-collapse: collapse;
-  }
-  
-  td, th {
-    padding: 10px;
-    border-bottom: 1px solid #444;
   }

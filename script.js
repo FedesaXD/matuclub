@@ -1,42 +1,54 @@
 const API = "https://thereafter-matthew-closure-grass.trycloudflare.com";
 
 async function fetchPlayer() {
-    const tag = document.getElementById("playerTag").value;
+    let tag = document.getElementById("playerTag").value;
+  
+    if (!tag.startsWith("#")) tag = "#" + tag;
+  
     const res = await fetch(`${API}/player/${tag}`);
     const data = await res.json();
   
-    const div = document.getElementById("playerInfo");
-  
     if (data.error) {
-      div.innerHTML = "<p>Jugador no encontrado</p>";
+      alert("Jugador no encontrado");
       return;
     }
   
-    div.innerHTML = `
-      <div class="card">
-        <h2>${data.name}</h2>
-        <p>🏆 Máx: ${data.highest_trophies}</p>
-        <p>🎮 3v3: ${data.wins3v3}</p>
-        <p>✨ Prestige: ${data.total_prestige}</p>
-        <p>🔥 Best WS: ${data.best_winstreak.value}</p>
-      </div>
-    `;
+    // PLAYER
+    document.getElementById("name").innerText = data.name;
+    document.getElementById("tag").innerText = tag;
   
+    // STATS
+    document.getElementById("trophies").innerText = data.highest_trophies;
+    document.getElementById("prestige").innerText = data.total_prestige;
+    document.getElementById("wins").innerText = data.wins3v3;
+  
+    // BRAWLERS
     renderBrawlers(data.top_brawlers);
   }
 
+
+
+
   function renderBrawlers(brawlers) {
-    let html = "<h3>Top Brawlers</h3><table>";
-    html += "<tr><th>Name</th><th>Trophies</th></tr>";
+    const container = document.getElementById("brawlers");
+    container.innerHTML = "";
   
     for (let b of brawlers) {
-      html += `<tr><td>${b[0]}</td><td>${b[5]}</td></tr>`;
+      const div = document.createElement("div");
+      div.className = "brawler";
+  
+      div.innerHTML = `
+        <strong>${b[0]}</strong>
+        <p>🏆 ${b[5]}</p>
+      `;
+  
+      container.appendChild(div);
     }
-  
-    html += "</table>";
-  
-    document.getElementById("playerInfo").innerHTML += html;
   }
+
+
+
+  
 
   async function fetchTopPrestige() {
     const res = await fetch(`${API}/top/prestige`);
