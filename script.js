@@ -1,7 +1,28 @@
 const API = "https://thereafter-matthew-closure-grass.trycloudflare.com";
 
-// Brawlify CDN para imágenes de brawlers
-const BRAWLIFY = "https://cdn.brawlify.com/brawler-bs";
+/* ─── BRAWLER IMAGE MAP ──────────────────────────────── */
+// Se carga una vez desde BrawlAPI y mapea NOMBRE_MAYUSCULAS -> imageUrl
+let BRAWLER_IMGS = {};
+
+async function loadBrawlerImages() {
+  try {
+    const res  = await fetch("https://api.brawlapi.com/v1/brawlers");
+    const data = await res.json();
+    if (data.list) {
+      data.list.forEach(b => {
+        // b.name puede ser "El Primo", guardamos en mayúsculas como clave
+        BRAWLER_IMGS[b.name.toUpperCase()] = b.imageUrl2 || b.imageUrl;
+      });
+    }
+  } catch(e) {
+    console.warn("No se pudieron cargar imágenes de brawlers:", e);
+  }
+}
+
+function getBrawlerImg(name) {
+  // name viene en MAYUSCULAS desde la DB
+  return BRAWLER_IMGS[name] || null;
+}
 
 /* ─── UTILS ──────────────────────────────────────────── */
 function showView(id) {
@@ -14,18 +35,11 @@ function fmt(n) {
   return Number(n).toLocaleString("es-UY");
 }
 
-// Convierte nombre de brawler a slug para imagen
-// ej: "BULL" -> "Bull", "EL PRIMO" -> "El-Primo"
-function brawlerSlug(name) {
-  return name
-    .toLowerCase()
-    .split(" ")
-    .map(w => w.charAt(0).toUpperCase() + w.slice(1))
-    .join("-");
-}
-
-function brawlerImgUrl(name) {
-  return `${BRAWLIFY}/${brawlerSlug(name)}.png`;
+// Navega a la vista de jugador con un tag dado y dispara la búsqueda
+function goToPlayer(tag) {
+  showView("player");
+  document.getElementById("playerTag").value = tag;
+  fetchPlayer();
 }
 
 /* ─── TOP PRESTIGE ───────────────────────────────────── */
@@ -35,15 +49,20 @@ async function fetchPrestige() {
   try {
     const res  = await fetch(`${API}/top/prestige`);
     const data = await res.json();
-    const rows = data.map(p => `
-      <tr>
-        <td>${p.rank}</td>
-        <td>${p.name}</td>
-        <td>${fmt(p.prestige)}</td>
-      </tr>
-    `).join("");
+    const rows = data.map(p => {
+      const clickable = p.tag
+        ? `onclick="goToPlayer('${p.tag}')" style="cursor:pointer"`
+        : "";
+      return `
+        <tr ${clickable} class="clickable-row">
+          <td>${p.rank}</td>
+          <td>${p.name}</td>
+          <td>${fmt(p.prestige)}</td>
+        </tr>`;
+    }).join("");
     container.innerHTML = `
       <div class="table-wrap">
+        <p class="table-hint">Click en un jugador para ver su perfil</p>
         <table>
           <thead><tr><th>#</th><th>Jugador</th><th>Prestige</th></tr></thead>
           <tbody>${rows}</tbody>
@@ -57,7 +76,7 @@ document.getElementById("prestige").addEventListener("click", fetchPrestige);
 
 /* ─── PLAYER ─────────────────────────────────────────── */
 let chart;
-let historyData = {}; // { trophies[], wins3v3[], winsSolo[], prestige[], labels[] }
+let historyData = {};
 
 async function fetchPlayer() {
   let tag = document.getElementById("playerTag").value.trim();
@@ -118,17 +137,16 @@ async function fetchPlayer() {
     // ── History chart ──────────────────────────────────
     if (data.history && data.history.length > 1) {
       historyData = {
-        labels:   data.history.map(h => {
+        labels:     data.history.map(h => {
           const d = new Date(h[0]);
           return `${d.getDate()}/${d.getMonth()+1} ${d.getHours()}:${String(d.getMinutes()).padStart(2,'0')}`;
         }),
-        trophies: data.history.map(h => h[1]),
-        wins3v3:  data.history.map(h => h[2]),
-        winsSolo: data.history.map(h => h[3]),
+        trophies:   data.history.map(h => h[1]),
+        wins3v3:    data.history.map(h => h[2]),
+        winsSolo:   data.history.map(h => h[3]),
         prestigeLvl: data.history.map(h => h[4]),
       };
       chartSec.style.display = "block";
-      // reset tabs
       document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
       document.querySelector(".tab").classList.add("active");
       renderChart("trophies");
@@ -140,33 +158,29 @@ async function fetchPlayer() {
       const grid = document.getElementById("brawlerGrid");
       grid.innerHTML = data.top_brawlers.map(b => {
         const [bName, power, gadgets, stars, hyper, trophies] = b;
-        const name = bName.toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
-        const imgUrl = brawlerImgUrl(bName);
+        const displayName = bName.toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
+        const imgUrl = getBrawlerImg(bName);
 
-        const gadgetPills  = gadgets > 0
-          ? `<span class="attr-pill attr-gadget">⚙️ ${gadgets}</span>` : "";
-        const starPills    = stars > 0
-          ? `<span class="attr-pill attr-star">⭐ ${stars}</span>` : "";
-        const hyperPills   = hyper > 0
-          ? `<span class="attr-pill attr-hyper">⚡ HC</span>` : "";
+        const imgTag = imgUrl
+          ? `<img src="${imgUrl}" alt="${displayName}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" />`
+          : "";
+        const placeholderStyle = imgUrl ? "display:none" : "display:flex";
+
+        const gadgetPills = gadgets > 0 ? `<span class="attr-pill attr-gadget">⚙️ ${gadgets}</span>` : "";
+        const starPills   = stars > 0   ? `<span class="attr-pill attr-star">⭐ ${stars}</span>`    : "";
+        const hyperPills  = hyper > 0   ? `<span class="attr-pill attr-hyper">⚡ HC</span>`          : "";
 
         return `
           <div class="brawler-card">
             <div class="brawler-img-wrap">
-              <img
-                src="${imgUrl}"
-                alt="${name}"
-                onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"
-              />
-              <div class="brawler-img-placeholder" style="display:none">${name}</div>
+              ${imgTag}
+              <div class="brawler-img-placeholder" style="${placeholderStyle}">${displayName}</div>
               <div class="brawler-power">P${power}</div>
               <div class="brawler-trophies">🏆 ${fmt(trophies)}</div>
             </div>
             <div class="brawler-info">
-              <div class="brawler-name">${name}</div>
-              <div class="brawler-attrs">
-                ${gadgetPills}${starPills}${hyperPills}
-              </div>
+              <div class="brawler-name">${displayName}</div>
+              <div class="brawler-attrs">${gadgetPills}${starPills}${hyperPills}</div>
             </div>
           </div>`;
       }).join("");
@@ -178,24 +192,20 @@ async function fetchPlayer() {
   }
 }
 
-/* ─── CHART RENDERING ────────────────────────────────── */
+/* ─── CHART ──────────────────────────────────────────── */
 const CHART_CONFIG = {
-  trophies: { label: "Copas",        color: "#00d4ff" },
-  wins3v3:  { label: "Victorias 3v3", color: "#0099ff" },
-  winsSolo: { label: "Victorias Solo", color: "#6655ff" },
-  prestigeLvl: { label: "Prestige",    color: "#00e899" },
+  trophies:    { label: "Copas",         color: "#00d4ff" },
+  wins3v3:     { label: "Victorias 3v3", color: "#0099ff" },
+  winsSolo:    { label: "Victorias Solo", color: "#6655ff" },
+  prestigeLvl: { label: "Prestige",      color: "#00e899" },
 };
 
 function renderChart(key) {
   const { label, color } = CHART_CONFIG[key];
-  const ctx = document.getElementById("chart");
-
   if (chart) chart.destroy();
-
   Chart.defaults.color = "#4a6a85";
   Chart.defaults.font.family = "'DM Sans', sans-serif";
-
-  chart = new Chart(ctx, {
+  chart = new Chart(document.getElementById("chart"), {
     type: "line",
     data: {
       labels: historyData.labels,
@@ -224,20 +234,12 @@ function renderChart(key) {
           titleColor: "#ddeeff",
           bodyColor: "#4a6a85",
           padding: 12,
-          callbacks: {
-            label: ctx => `${label}: ${fmt(ctx.parsed.y)}`
-          }
+          callbacks: { label: ctx => `${label}: ${fmt(ctx.parsed.y)}` }
         }
       },
       scales: {
-        x: {
-          grid: { color: "rgba(255,255,255,0.04)", drawBorder: false },
-          ticks: { color: "#4a6a85", maxTicksLimit: 8, maxRotation: 0 },
-        },
-        y: {
-          grid: { color: "rgba(255,255,255,0.04)", drawBorder: false },
-          ticks: { color: "#4a6a85", callback: v => fmt(v) },
-        }
+        x: { grid: { color: "rgba(255,255,255,0.04)" }, ticks: { color: "#4a6a85", maxTicksLimit: 8, maxRotation: 0 } },
+        y: { grid: { color: "rgba(255,255,255,0.04)" }, ticks: { color: "#4a6a85", callback: v => fmt(v) } }
       }
     }
   });
@@ -256,7 +258,7 @@ function hexAlpha(hex, alpha) {
   return `rgba(${r},${g},${b},${alpha})`;
 }
 
-/* ─── BRAWLER TOP ────────────────────────────────────── */
+/* ─── TOP BRAWLER ────────────────────────────────────── */
 async function fetchBrawler() {
   const name      = document.getElementById("brawlerName").value.trim();
   const container = document.getElementById("brawlerList");
@@ -272,16 +274,21 @@ async function fetchBrawler() {
       return;
     }
 
-    const rows = data.map(p => `
-      <tr>
-        <td>${p.rank}</td>
-        <td>${p.name}</td>
-        <td>${fmt(p.trophies)}</td>
-      </tr>
-    `).join("");
+    const rows = data.map(p => {
+      const clickable = p.tag
+        ? `onclick="goToPlayer('${p.tag}')" style="cursor:pointer"`
+        : "";
+      return `
+        <tr ${clickable} class="clickable-row">
+          <td>${p.rank}</td>
+          <td>${p.name}</td>
+          <td>${fmt(p.trophies)}</td>
+        </tr>`;
+    }).join("");
 
     container.innerHTML = `
       <div class="table-wrap">
+        <p class="table-hint">Click en un jugador para ver su perfil</p>
         <table>
           <thead><tr><th>#</th><th>Jugador</th><th>Trofeos</th></tr></thead>
           <tbody>${rows}</tbody>
@@ -292,10 +299,13 @@ async function fetchBrawler() {
   }
 }
 
-/* ─── KEYBOARD SHORTCUTS ─────────────────────────────── */
+/* ─── KEYBOARD ───────────────────────────────────────── */
 document.getElementById("playerTag").addEventListener("keydown", e => {
   if (e.key === "Enter") fetchPlayer();
 });
 document.getElementById("brawlerName").addEventListener("keydown", e => {
   if (e.key === "Enter") fetchBrawler();
 });
+
+/* ─── INIT ───────────────────────────────────────────── */
+loadBrawlerImages();

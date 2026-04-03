@@ -517,6 +517,21 @@ td:last-child {
 }
 tbody tr { transition: background 0.15s; }
 tbody tr:hover { background: var(--surface-2); }
+tbody tr.clickable-row:hover {
+  background: var(--surface-3);
+  outline: 1px solid var(--border-glow);
+}
+tbody tr.clickable-row:hover td:nth-child(2) {
+  color: var(--accent);
+}
+
+.table-hint {
+  font-size: 11px;
+  color: var(--muted-2);
+  text-align: right;
+  margin-bottom: 8px;
+  letter-spacing: 0.04em;
+}
 tbody tr:nth-child(1) td:first-child { color: #ffd700; }
 tbody tr:nth-child(2) td:first-child { color: #b0c4de; }
 tbody tr:nth-child(3) td:first-child { color: #cd7f32; }
