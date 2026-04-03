@@ -1,4 +1,4 @@
-const API = "https://reform-proven-gbp-prescription.trycloudflare.com";
+const API = "https://matuclub-api.onrender.com";
 
 /* ─── BRAWLER IMAGE MAP ──────────────────────────────── */
 // Se carga una vez desde BrawlAPI y mapea NOMBRE_MAYUSCULAS -> imageUrl
