@@ -256,7 +256,7 @@ function fetchPlayer() {
           var starPill = stars > 0
             ? '<span class="attr-pill attr-star">' + icon("starpower") + " " + stars + '</span>' : "";
           var hyperPill = hyper > 0
-            ? '<span class="attr-pill attr-hyper">' + icon("hypercharge") + " HC</span>' : "";
+            ? '<span class="attr-pill attr-hyper">' + icon("hypercharge") + " HC</span>" : "";
 
           return '<div class="brawler-card">'
             + '<div class="brawler-img-wrap">'
