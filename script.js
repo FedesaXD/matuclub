@@ -1,5 +1,14 @@
 const API = "https://matuclub-api.onrender.com";
 
+// DEBUG TEMPORAL - borrar después
+window.onerror = function(msg, src, line, col, err) {
+  document.body.innerHTML += `<div style="position:fixed;bottom:0;left:0;right:0;background:red;color:white;padding:10px;font-size:12px;z-index:9999">ERROR: ${msg} | ${src}:${line}</div>`;
+  return false;
+};
+window.addEventListener('unhandledrejection', e => {
+  document.body.innerHTML += `<div style="position:fixed;bottom:0;left:0;right:0;background:red;color:white;padding:10px;font-size:12px;z-index:9999">PROMISE ERROR: ${e.reason}</div>`;
+});
+
 /* ─── BRAWLER & ASSET IMAGE MAPS ────────────────────── */
 let BRAWLER_IMGS = {};
 // Iconos del juego desde BrawlAPI
