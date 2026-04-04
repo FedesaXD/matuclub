@@ -311,15 +311,27 @@ input:focus { border-color: var(--border-glow); }
 .stat-box .stat-icon { margin-right: 4px; }
 
 /* ─── GAME ICONS ──────────────────────────────────────── */
-.stat-icon-img {
-  width: 22px;
-  height: 22px;
-  object-fit: contain;
-  margin-right: 5px;
-  vertical-align: middle;
+.stat-icon-svg {
+  width: 20px;
+  height: 20px;
   display: inline-block;
+  vertical-align: middle;
+  margin-right: 5px;
+  flex-shrink: 0;
 }
-.stat-icon-emoji {
+.brawler-trophies .stat-icon-svg {
+  width: 13px;
+  height: 13px;
+  margin-right: 2px;
+}
+.attr-pill .stat-icon-svg {
+  width: 13px;
+  height: 13px;
+  margin-right: 2px;
+}
+.ws-val .stat-icon-svg {
+  width: 18px;
+  height: 18px;
   margin-right: 4px;
 }
 .header-icon {
@@ -334,24 +346,6 @@ input:focus { border-color: var(--border-glow); }
   height: 28px;
   object-fit: contain;
   display: block;
-}
-.attr-pill .stat-icon-img {
-  width: 14px;
-  height: 14px;
-  margin-right: 3px;
-  vertical-align: middle;
-}
-.brawler-trophies .stat-icon-img {
-  width: 13px;
-  height: 13px;
-  margin-right: 2px;
-  vertical-align: middle;
-}
-.ws-val .stat-icon-img {
-  width: 20px;
-  height: 20px;
-  margin-right: 4px;
-  vertical-align: middle;
 }
 
 /* ─── SECTION HEADER ──────────────────────────────────── */
