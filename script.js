@@ -1,4 +1,4 @@
-const API = "https://thereafter-matthew-closure-grass.trycloudflare.com";
+const API = "https://matuclub-api.onrender.com";
 
 /* ─── BRAWLER & ASSET IMAGE MAPS ────────────────────── */
 let BRAWLER_IMGS = {};
