@@ -709,7 +709,7 @@ tbody tr:nth-child(3) td:first-child { color: #cd7f32; }
 .prestige-badge-num {
   position: relative;
   z-index: 1;
-  margin-top: -6px;
+  margin-top: 1px;
   font-family: var(--font-game);
   font-size: 23px;
   color: #fff;
@@ -839,4 +839,76 @@ tbody tr:nth-child(3) td:first-child { color: #cd7f32; }
 .brawler-power-wrap .brawler-power-img {
   width: 36px !important;
   height: 36px !important;
+}
+
+/* ─── PLAYER TABS (clubs) ────────────────────────────── */
+.player-tabs-bar {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.player-tab {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xs);
+  padding: 8px 16px;
+  color: var(--muted);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.player-tab:hover { color: var(--text); border-color: var(--border-glow); }
+.player-tab.active {
+  background: var(--accent-dim);
+  border-color: rgba(0,212,255,0.35);
+  color: var(--accent);
+}
+
+/* ─── MEMBER LIST ────────────────────────────────────── */
+.member-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.member-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  object-fit: cover;
+  flex-shrink: 0;
+  background: var(--surface-3);
+}
+.member-avatar-ph {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  background: var(--surface-3);
+  flex-shrink: 0;
+}
+.member-trophies-cell {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  justify-content: flex-end;
+  font-family: var(--font-head);
+  font-weight: 600;
+  color: var(--accent);
+  font-size: 14px;
+}
+.trophy-inline {
+  width: 18px !important;
+  height: 18px !important;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+.td-rank {
+  font-family: var(--font-head);
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--muted);
+  width: 36px;
 }
