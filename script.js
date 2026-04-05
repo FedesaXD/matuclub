@@ -356,6 +356,44 @@ function fetchBrawler() {
     });
 }
 
+
+/* ─── CLUB MEMBERS ──────────────────────────────────── */
+var clubCache = {};
+
+function loadClubMembers(clubNum) {
+  var container = document.getElementById("clubMemberList");
+  if (clubCache[clubNum]) { renderClubMembers(clubCache[clubNum]); return; }
+  container.innerHTML = renderSkeleton(8, "table");
+  fetch(API + "/club/" + clubNum + "/members")
+    .then(function(res) { return res.json(); })
+    .then(function(data) {
+      if (data.error) { container.innerHTML = "<div class='loading'>" + data.error + "</div>"; return; }
+      clubCache[clubNum] = data;
+      renderClubMembers(data);
+    })
+    .catch(function() {
+      container.innerHTML = "<div class='loading'>Error al cargar miembros</div>";
+    });
+}
+
+function renderClubMembers(data) {
+  var rows = data.map(function(m) {
+    var av = m.icon_url
+      ? "<img src='" + m.icon_url + "' class='member-avatar' onerror='this.style.display=\"none\"'>" 
+      : "<div class='member-avatar member-avatar-ph'></div>";
+    return "<tr class='clickable-row' data-tag='" + m.tag + "' style='cursor:pointer'>"
+      + "<td class='td-rank'>" + m.rank + "</td>"
+      + "<td><div class='member-row'>" + av + "<span>" + m.name + "</span></div></td>"
+      + "<td><div class='member-trophies-cell'><img src='trophy.webp' class='trophy-inline'><span>" + fmt(m.trophies) + "</span></div></td>"
+      + "</tr>";
+  }).join("");
+  document.getElementById("clubMemberList").innerHTML =
+    "<div class='table-wrap'>"
+    + "<p class='table-hint'>Toca un jugador para ver su perfil</p>"
+    + "<table><thead><tr><th>#</th><th>Jugador</th><th>Trofeos</th></tr></thead>"
+    + "<tbody>" + rows + "</tbody></table></div>";
+}
+
 /* ─── INIT (todo dentro de DOMContentLoaded) ─────────── */
 document.addEventListener("DOMContentLoaded", function() {
 
@@ -366,6 +404,13 @@ document.addEventListener("DOMContentLoaded", function() {
   });
   document.getElementById("btn-player").addEventListener("click", function() {
     showView("player");
+    // Activar tab 1 y cargar sus miembros
+    document.querySelectorAll(".player-tab").forEach(function(t) { t.classList.remove("active"); });
+    var t1 = document.querySelector(".player-tab[data-club='1']");
+    if (t1) t1.classList.add("active");
+    document.getElementById("panel-search").style.display = "none";
+    document.getElementById("panel-club").style.display = "block";
+    loadClubMembers("1");
   });
   document.getElementById("btn-brawler").addEventListener("click", function() {
     showView("brawler");
@@ -404,6 +449,26 @@ document.addEventListener("DOMContentLoaded", function() {
   document.addEventListener("click", function(e) {
     var row = e.target.closest("tr[data-tag]");
     if (row) goToPlayer(row.getAttribute("data-tag"));
+  });
+
+  /* Tabs de clubs en vista jugador */
+  document.querySelectorAll(".player-tab").forEach(function(tab) {
+    tab.addEventListener("click", function() {
+      document.querySelectorAll(".player-tab").forEach(function(t) { t.classList.remove("active"); });
+      tab.classList.add("active");
+      var club = tab.getAttribute("data-club");
+      document.getElementById("playerProfile").innerHTML = "";
+      document.getElementById("chartSection").style.display = "none";
+      document.getElementById("brawlersSection").style.display = "none";
+      if (club === "search") {
+        document.getElementById("panel-search").style.display = "block";
+        document.getElementById("panel-club").style.display = "none";
+      } else {
+        document.getElementById("panel-search").style.display = "none";
+        document.getElementById("panel-club").style.display = "block";
+        loadClubMembers(club);
+      }
+    });
   });
 
   /* Autocomplete brawler */
