@@ -21,6 +21,7 @@
   --radius-xs:   6px;
   --font-head:   'Syne', sans-serif;
   --font-body:   'DM Sans', sans-serif;
+  --font-game:   'Lilita One', cursive;
 }
 
 html, body {
@@ -485,9 +486,8 @@ input:focus { border-color: var(--border-glow); }
   padding: 10px 12px;
 }
 .brawler-name {
-  font-family: var(--font-head);
+  font-family: var(--font-game);
   font-size: 13px;
-  font-weight: 700;
   color: #fff;
   text-transform: capitalize;
   white-space: nowrap;
@@ -718,15 +718,16 @@ tbody tr:nth-child(3) td:first-child { color: #cd7f32; }
 }
 .prestige-badge-num {
   position: absolute;
-  font-family: var(--font-head);
-  font-size: 13px;
-  font-weight: 800;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, 10%);
+  font-family: var(--font-game);
+  font-size: 18px;
   color: #fff;
-  text-shadow: 0 1px 4px rgba(0,0,0,0.8);
-  letter-spacing: -0.03em;
+  text-shadow: 0 2px 6px rgba(0,0,0,0.9), 0 0 12px rgba(80,120,255,0.6);
   text-align: center;
   line-height: 1;
-  bottom: 16px;
+  white-space: nowrap;
 }
 
 /* ─── STAT BOXES CON ASSET IMGS ──────────────────────── */
@@ -780,11 +781,10 @@ tbody tr:nth-child(3) td:first-child { color: #cd7f32; }
 }
 .brawler-power-num {
   position: relative;
-  font-family: var(--font-head);
-  font-size: 13px;
-  font-weight: 800;
+  font-family: var(--font-game);
+  font-size: 14px;
   color: #fff;
-  text-shadow: 0 1px 3px rgba(0,0,0,0.9);
+  text-shadow: 0 1px 4px rgba(0,0,0,1), 0 0 8px rgba(0,0,0,0.8);
   z-index: 1;
   line-height: 1;
 }
@@ -803,15 +803,14 @@ tbody tr:nth-child(3) td:first-child { color: #cd7f32; }
   padding: 2px 6px;
 }
 .trophy-icon-img {
-  width: 16px;
-  height: 16px;
+  width: 13px;
+  height: 13px;
   object-fit: contain;
   flex-shrink: 0;
 }
 .brawler-trophies span {
-  font-family: var(--font-head);
+  font-family: var(--font-game);
   font-size: 11px;
-  font-weight: 700;
   color: #ffd700;
 }
 
