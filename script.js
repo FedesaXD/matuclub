@@ -58,7 +58,18 @@ function showView(id) {
 function fmt(n) { return Number(n).toLocaleString("es-UY"); }
 
 function goToPlayer(tag) {
-  showView("player");
+  var alreadyInPlayer = document.getElementById("player").classList.contains("active");
+  if (!alreadyInPlayer) {
+    // Venimos de otra vista - activar sin disparar el btn-player listener
+    document.querySelectorAll(".view").forEach(function(v) { v.classList.remove("active"); });
+    document.getElementById("player").classList.add("active");
+    window.scrollTo(0, 0);
+  }
+  // Scroll al perfil
+  setTimeout(function() {
+    var el = document.getElementById("playerProfile");
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, 100);
   fetchPlayerByTag(tag);
 }
 
@@ -148,8 +159,10 @@ function fetchPlayer() {
 function fetchPlayerByTag(tag) {
   if (!tag) return;
   if (tag[0] !== "#") tag = "#" + tag;
+  console.log("fetchPlayerByTag llamado con:", tag);
 
   var profileEl   = document.getElementById("playerProfile");
+  console.log("profileEl:", profileEl, "innerHTML antes:", profileEl ? profileEl.innerHTML.slice(0,50) : "NULL");
   var chartSec    = document.getElementById("chartSection");
   var brawlersSec = document.getElementById("brawlersSection");
 
@@ -399,6 +412,12 @@ function renderClubMembers(data) {
     + "<tbody>" + rows + "</tbody></table></div>";
 }
 
+/* ─── CLICK EN FILAS (scope global para evitar conflictos) ── */
+document.addEventListener("click", function(e) {
+  var row = e.target.closest("tr[data-tag]");
+  if (row) goToPlayer(row.getAttribute("data-tag"));
+});
+
 /* ─── INIT (todo dentro de DOMContentLoaded) ─────────── */
 document.addEventListener("DOMContentLoaded", function() {
 
@@ -450,13 +469,7 @@ document.addEventListener("DOMContentLoaded", function() {
     });
   });
 
-  /* Click en filas de tabla */
-  document.addEventListener("click", function(e) {
-    console.log("click en:", e.target.tagName, e.target.className);
-    var row = e.target.closest("tr[data-tag]");
-    console.log("row encontrado:", row);
-    if (row) goToPlayer(row.getAttribute("data-tag"));
-  });
+  /* Click en filas de tabla: listener movido al scope global */
 
   /* Tabs de clubs en vista jugador */
   document.querySelectorAll(".player-tab").forEach(function(tab) {
