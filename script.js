@@ -121,15 +121,13 @@ var TOP_CONFIG = {
 
 function loadTop(topKey) {
   var container = document.getElementById("topList");
-  if (!container) { console.error("topList no encontrado"); return; }
+  if (!container) return;
   if (topCache[topKey]) { renderTop(topKey, topCache[topKey]); return; }
   container.innerHTML = renderSkeleton(10, "table");
   var url = API + "/top/" + topKey;
-  console.log("loadTop fetch:", url);
   fetch(url)
     .then(function(res) { return res.json(); })
     .then(function(data) {
-      console.log("loadTop data recibida:", topKey, Array.isArray(data) ? data.length + " items" : data);
       topCache[topKey] = data;
       renderTop(topKey, data);
     })
@@ -197,8 +195,38 @@ function renderClubMembers(data) {
 
 /* ─── CLICK EN FILAS (scope global para evitar conflictos) ── */
 document.addEventListener("click", function(e) {
+  // Filas de tabla
   var row = e.target.closest("tr[data-tag]");
-  if (row) goToPlayer(row.getAttribute("data-tag"));
+  if (row) { goToPlayer(row.getAttribute("data-tag")); return; }
+
+  // Tabs de top jugadores
+  var topTab = e.target.closest(".top-tab");
+  if (topTab) {
+    document.querySelectorAll(".top-tab").forEach(function(t) { t.classList.remove("active"); });
+    topTab.classList.add("active");
+    loadTop(topTab.getAttribute("data-top"));
+    return;
+  }
+
+  // Tabs de clubs (player-tab)
+  var playerTab = e.target.closest(".player-tab");
+  if (playerTab) {
+    document.querySelectorAll(".player-tab").forEach(function(t) { t.classList.remove("active"); });
+    playerTab.classList.add("active");
+    var club = playerTab.getAttribute("data-club");
+    document.getElementById("playerProfile").innerHTML = "";
+    document.getElementById("chartSection").style.display = "none";
+    document.getElementById("brawlersSection").style.display = "none";
+    if (club === "search") {
+      document.getElementById("panel-search").style.display = "block";
+      document.getElementById("panel-club").style.display = "none";
+    } else {
+      document.getElementById("panel-search").style.display = "none";
+      document.getElementById("panel-club").style.display = "block";
+      loadClubMembers(club);
+    }
+    return;
+  }
 });
 
 /* ─── INIT (todo dentro de DOMContentLoaded) ─────────── */
@@ -258,34 +286,9 @@ document.addEventListener("DOMContentLoaded", function() {
 
   /* Click en filas de tabla: listener movido al scope global */
 
-  /* Tabs de top jugadores */
-  document.querySelectorAll(".top-tab").forEach(function(tab) {
-    tab.addEventListener("click", function() {
-      document.querySelectorAll(".top-tab").forEach(function(t) { t.classList.remove("active"); });
-      tab.classList.add("active");
-      loadTop(tab.getAttribute("data-top"));
-    });
-  });
+  /* top-tab listeners: ver event delegation global */
 
-  /* Tabs de clubs en vista jugador */
-  document.querySelectorAll(".player-tab").forEach(function(tab) {
-    tab.addEventListener("click", function() {
-      document.querySelectorAll(".player-tab").forEach(function(t) { t.classList.remove("active"); });
-      tab.classList.add("active");
-      var club = tab.getAttribute("data-club");
-      document.getElementById("playerProfile").innerHTML = "";
-      document.getElementById("chartSection").style.display = "none";
-      document.getElementById("brawlersSection").style.display = "none";
-      if (club === "search") {
-        document.getElementById("panel-search").style.display = "block";
-        document.getElementById("panel-club").style.display = "none";
-      } else {
-        document.getElementById("panel-search").style.display = "none";
-        document.getElementById("panel-club").style.display = "block";
-        loadClubMembers(club);
-      }
-    });
-  });
+  /* player-tab listeners: ver event delegation global */
 
   /* Autocomplete brawler */
   var brawlerInput = document.getElementById("brawlerName");
