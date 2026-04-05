@@ -121,15 +121,20 @@ var TOP_CONFIG = {
 
 function loadTop(topKey) {
   var container = document.getElementById("topList");
+  if (!container) { console.error("topList no encontrado"); return; }
   if (topCache[topKey]) { renderTop(topKey, topCache[topKey]); return; }
   container.innerHTML = renderSkeleton(10, "table");
-  fetch(API + "/top/" + topKey)
+  var url = API + "/top/" + topKey;
+  console.log("loadTop fetch:", url);
+  fetch(url)
     .then(function(res) { return res.json(); })
     .then(function(data) {
+      console.log("loadTop data recibida:", topKey, Array.isArray(data) ? data.length + " items" : data);
       topCache[topKey] = data;
       renderTop(topKey, data);
     })
-    .catch(function() {
+    .catch(function(e) {
+      console.error("loadTop error:", e);
       container.innerHTML = "<div class='loading'>Error al cargar datos</div>";
     });
 }
