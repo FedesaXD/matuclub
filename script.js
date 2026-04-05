@@ -3,6 +3,7 @@ const API = "https://matuclub-api.onrender.com";
 /* ─── BRAWLER IMAGE MAP ──────────────────────────────── */
 var BRAWLER_IMGS = {};
 var BRAWLER_LIST = [];
+var ICON_MAP = {}; // icon_id -> imageUrl
 
 function loadBrawlerImages() {
   fetch("https://api.brawlify.com/v1/brawlers")
@@ -32,7 +33,20 @@ function getBrawlerImg(name) {
 
 function getPlayerIconUrl(iconId) {
   if (!iconId) return null;
-  return "https://cdn.brawlify.com/profile/" + iconId + ".png?v=1";
+  return ICON_MAP[iconId] || null;
+}
+
+function loadPlayerIcons() {
+  fetch("https://api.brawlify.com/v1/icons")
+    .then(function(res) { return res.json(); })
+    .then(function(data) {
+      if (!data.player) return;
+      Object.keys(data.player).forEach(function(id) {
+        var icon = data.player[id];
+        ICON_MAP[parseInt(id)] = icon.imageUrl || null;
+      });
+    })
+    .catch(function() { console.warn("No se pudieron cargar iconos de jugadores"); });
 }
 
 /* ─── ICONOS SVG ─────────────────────────────────────── */
@@ -163,7 +177,6 @@ function fetchPlayer() {
         return;
       }
 
-      console.log('icon_id recibido:', data.icon_id, '| URL:', getPlayerIconUrl(data.icon_id));
       var iconUrl    = getPlayerIconUrl(data.icon_id);
       var avatarHtml = iconUrl
         ? "<img src='" + iconUrl + "' alt='avatar' class='player-avatar' crossorigin='anonymous'"
@@ -428,4 +441,5 @@ document.addEventListener("DOMContentLoaded", function() {
 
   /* Init */
   loadBrawlerImages();
+  loadPlayerIcons();
 });
