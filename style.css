@@ -700,3 +700,134 @@ tbody tr:nth-child(3) td:first-child { color: #cd7f32; }
   background: var(--surface-3);
   color: var(--accent);
 }
+
+/* ─── PRESTIGE BADGE (encima del perfil) ─────────────── */
+.prestige-badge {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.prestige-badge-img {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  display: block;
+  filter: drop-shadow(0 0 10px rgba(80,120,255,0.5));
+}
+.prestige-badge-num {
+  position: absolute;
+  font-family: var(--font-head);
+  font-size: 13px;
+  font-weight: 800;
+  color: #fff;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+  letter-spacing: -0.03em;
+  text-align: center;
+  line-height: 1;
+  bottom: 16px;
+}
+
+/* ─── STAT BOXES CON ASSET IMGS ──────────────────────── */
+.stat-val-img {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.stat-asset-img {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+/* ─── WINSTREAK EN LA GRID ───────────────────────────── */
+.stat-ws-val {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-head);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--accent);
+}
+.ws-fire { font-size: 20px; line-height: 1; }
+.ws-number { color: #fff; }
+.stat-ws-brawler {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 2px;
+  text-transform: capitalize;
+}
+
+/* ─── BRAWLER CARD: POWER LEVEL CON ICONO ────────────── */
+.brawler-power-wrap {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+}
+.brawler-power-img {
+  position: absolute;
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+}
+.brawler-power-num {
+  position: relative;
+  font-family: var(--font-head);
+  font-size: 13px;
+  font-weight: 800;
+  color: #fff;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.9);
+  z-index: 1;
+  line-height: 1;
+}
+
+/* ─── BRAWLER CARD: TROFEOS CON ICONO REAL ───────────── */
+.brawler-trophies {
+  position: absolute;
+  top: 7px;
+  right: 7px;
+  background: rgba(0,0,0,0.70);
+  border: 1px solid rgba(255,220,0,0.3);
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 6px;
+}
+.trophy-icon-img {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+.brawler-trophies span {
+  font-family: var(--font-head);
+  font-size: 11px;
+  font-weight: 700;
+  color: #ffd700;
+}
+
+/* ─── BRAWLER ATTRS: ICONOS REPETIDOS ────────────────── */
+.brawler-attrs {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.attr-icon-img {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+}
+.attr-icon-hc {
+  width: 20px;
+  height: 20px;
+}
