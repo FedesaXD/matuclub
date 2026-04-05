@@ -709,7 +709,7 @@ tbody tr:nth-child(3) td:first-child { color: #cd7f32; }
 .prestige-badge-num {
   position: relative;
   z-index: 1;
-  margin-top: 18px;
+  margin-top: 8px;
   font-family: var(--font-game);
   font-size: 20px;
   color: #fff;
@@ -763,10 +763,10 @@ tbody tr:nth-child(3) td:first-child { color: #cd7f32; }
   height: 36px;
 }
 .brawler-power-img {
-  position: absolute;
-  width: 36px;
-  height: 36px;
-  object-fit: contain;
+  position: absolute !important;
+  width: 36px !important;
+  height: 36px !important;
+  object-fit: contain !important;
 }
 .brawler-power-num {
   position: relative;
@@ -792,10 +792,13 @@ tbody tr:nth-child(3) td:first-child { color: #cd7f32; }
   padding: 2px 6px;
 }
 .trophy-icon-img {
-  width: 13px;
-  height: 13px;
-  object-fit: contain;
+  width: 14px !important;
+  height: 14px !important;
+  min-width: 14px !important;
+  max-width: 14px !important;
+  object-fit: contain !important;
   flex-shrink: 0;
+  display: inline-block;
 }
 .brawler-trophies span {
   font-family: var(--font-game);
@@ -818,4 +821,22 @@ tbody tr:nth-child(3) td:first-child { color: #cd7f32; }
 .attr-icon-hc {
   width: 20px;
   height: 20px;
+}
+
+/* Asegurar que los iconos overlay no sean pisados por reglas genericas */
+.brawler-trophies img,
+.brawler-power-wrap img {
+  width: auto !important;
+  height: auto !important;
+  max-width: none !important;
+  max-height: none !important;
+  object-fit: contain !important;
+}
+.brawler-trophies .trophy-icon-img {
+  width: 14px !important;
+  height: 14px !important;
+}
+.brawler-power-wrap .brawler-power-img {
+  width: 36px !important;
+  height: 36px !important;
 }
