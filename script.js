@@ -59,8 +59,7 @@ function fmt(n) { return Number(n).toLocaleString("es-UY"); }
 
 function goToPlayer(tag) {
   showView("player");
-  document.getElementById("playerTag").value = tag;
-  fetchPlayer();
+  fetchPlayerByTag(tag);
 }
 
 /* ─── SKELETON ───────────────────────────────────────── */
@@ -141,6 +140,12 @@ var historyData = {};
 
 function fetchPlayer() {
   var tag = document.getElementById("playerTag").value.trim();
+  if (!tag) return;
+  if (tag[0] !== "#") tag = "#" + tag;
+  fetchPlayerByTag(tag);
+}
+
+function fetchPlayerByTag(tag) {
   if (!tag) return;
   if (tag[0] !== "#") tag = "#" + tag;
 
