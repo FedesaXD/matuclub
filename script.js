@@ -452,7 +452,9 @@ document.addEventListener("DOMContentLoaded", function() {
 
   /* Click en filas de tabla */
   document.addEventListener("click", function(e) {
+    console.log("click en:", e.target.tagName, e.target.className);
     var row = e.target.closest("tr[data-tag]");
+    console.log("row encontrado:", row);
     if (row) goToPlayer(row.getAttribute("data-tag"));
   });
 
