@@ -32,7 +32,7 @@ function getBrawlerImg(name) {
 
 function getPlayerIconUrl(iconId) {
   if (!iconId) return null;
-  return "https://cdn.brawlify.com/profile/" + iconId + ".png";
+  return "https://cdn.brawlify.com/profile/" + iconId + ".png?v=1";
 }
 
 /* ─── ICONOS SVG ─────────────────────────────────────── */
@@ -163,9 +163,12 @@ function fetchPlayer() {
         return;
       }
 
+      console.log('icon_id recibido:', data.icon_id, '| URL:', getPlayerIconUrl(data.icon_id));
       var iconUrl    = getPlayerIconUrl(data.icon_id);
       var avatarHtml = iconUrl
-        ? "<img src='" + iconUrl + "' alt='avatar' class='player-avatar' onerror=\"this.style.display='none'\">"
+        ? "<img src='" + iconUrl + "' alt='avatar' class='player-avatar' crossorigin='anonymous'"
+          + " onerror=\"this.style.display='none';this.nextElementSibling.style.display='flex'\">"
+          + "<div class='player-avatar-placeholder' style='display:none'></div>"
         : "<div class='player-avatar-placeholder'></div>";
 
       var clubDisplay = data.club_name
