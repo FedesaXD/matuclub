@@ -553,7 +553,23 @@ function renderEventCard(ev) {
     dateStr = "<div class='ev-date'>Cerrado el " + d.toLocaleDateString("es-UY", { day:"2-digit", month:"short", year:"numeric", hour:"2-digit", minute:"2-digit" }) + "</div>";
   }
 
-  var metricLabel = ev.metric === "trophies" ? "Copas subidas" : ev.metric;
+  var metricLabel = {
+    "trophies":        "Copas subidas",
+    "wins3v3":         "Victorias 3v3",
+    "winsSolo":        "Victorias Solo",
+    "prestige":        "Prestige subido",
+    "brawler_trophies": "Copas con " + (ev.brawler_name || "brawler")
+  }[ev.metric] || ev.metric;
+
+  var metricBadge = "";
+  if (ev.metric === "brawler_trophies" && ev.brawler_name) {
+    var bImg = getBrawlerImg(ev.brawler_name);
+    var bDisplay = ev.brawler_name.toLowerCase().replace(/\b\w/g, function(c) { return c.toUpperCase(); });
+    metricBadge = "<div class='ev-brawler-badge'>"
+      + "<img src='" + bImg + "' class='ev-brawler-img' onerror='this.style.display=\"none\"'>"
+      + "<span>" + bDisplay + "</span>"
+      + "</div>";
+  }
 
   var topParticipants = (ev.participants || []).slice(0, 3);
   var podiumHtml = "";
@@ -593,7 +609,7 @@ function renderEventCard(ev) {
           return "<tr>"
             + "<td>" + p.rank + "</td>"
             + "<td>" + p.name + "</td>"
-            + "<td style='color:var(--muted)'>" + fmt(p.trophies_start) + "</td>"
+            + "<td style='color:var(--muted)'>" + fmt(p.value_start) + "</td>"
             + "<td class='" + deltaClass + "'>" + deltaSign + fmt(p.delta) + "</td>"
             + "</tr>";
         }).join("")
@@ -608,6 +624,7 @@ function renderEventCard(ev) {
     + "<div class='ev-title'>" + ev.title + "</div>"
     + (ev.description ? "<div class='ev-desc'>" + ev.description + "</div>" : "")
     + "<div class='ev-reward'><span class='ev-reward-label'>Recompensa</span><span class='ev-reward-val'>" + ev.reward + "</span></div>"
+    + metricBadge
     + podiumHtml
     + showAllBtn
     + tableHtml
