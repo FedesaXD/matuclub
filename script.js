@@ -493,4 +493,157 @@ document.addEventListener("DOMContentLoaded", function() {
   });
 
   loadBrawlerImages();
+
+  // Eventos
+  document.getElementById("btn-eventos").addEventListener("click", function() {
+    showView("eventos");
+    loadEventos();
+  });
+  document.getElementById("btn-back-eventos").addEventListener("click", function() { showView("home"); });
 });
+
+/* ─── EVENTOS ────────────────────────────────────────── */
+
+function loadEventos() {
+  var container = document.getElementById("eventosContent");
+  if (!container) return;
+  container.innerHTML = "<div class='loading'>Cargando eventos...</div>";
+
+  fetch(API + "/events")
+    .then(function(res) { return res.json(); })
+    .then(function(events) {
+      if (!events || events.length === 0) {
+        container.innerHTML = renderEventosEmpty();
+        return;
+      }
+      container.innerHTML = events.map(function(ev) {
+        return renderEventCard(ev);
+      }).join("");
+
+      // Start live countdowns for active events
+      events.forEach(function(ev) {
+        if (ev.is_active && ev.ends_at) {
+          startEventCountdown(ev.id, ev.ends_at);
+        }
+      });
+    })
+    .catch(function() {
+      container.innerHTML = "<div class='loading'>Error al cargar eventos</div>";
+    });
+}
+
+function renderEventosEmpty() {
+  return "<div class='ev-empty'>"
+    + "<div class='ev-empty-icon'>🏆</div>"
+    + "<div class='ev-empty-title'>Sin eventos por ahora</div>"
+    + "<div class='ev-empty-sub'>El admin activará un evento pronto. ¡Estate atento!</div>"
+    + "</div>";
+}
+
+function renderEventCard(ev) {
+  var isActive = ev.is_active;
+  var statusClass = isActive ? "ev-status ev-status-active" : "ev-status ev-status-closed";
+  var statusLabel = isActive ? "● EN CURSO" : "✓ FINALIZADO";
+
+  var dateStr = "";
+  if (isActive && ev.ends_at) {
+    dateStr = "<div class='ev-countdown' id='ev-countdown-" + ev.id + "'>Calculando...</div>";
+  } else if (ev.closed_at) {
+    var d = new Date(ev.closed_at);
+    dateStr = "<div class='ev-date'>Cerrado el " + d.toLocaleDateString("es-UY", { day:"2-digit", month:"short", year:"numeric", hour:"2-digit", minute:"2-digit" }) + "</div>";
+  }
+
+  var metricLabel = ev.metric === "trophies" ? "Copas subidas" : ev.metric;
+
+  var topParticipants = (ev.participants || []).slice(0, 3);
+  var podiumHtml = "";
+  if (topParticipants.length > 0) {
+    podiumHtml = "<div class='ev-podium'>" + topParticipants.map(function(p, i) {
+      var medals = ["🥇","🥈","🥉"];
+      var av = p.icon_url
+        ? "<img src='" + p.icon_url + "' class='ev-avatar' onerror='this.style.display=\"none\"'>"
+        : "<div class='ev-avatar ev-avatar-ph'></div>";
+      var deltaSign = p.delta > 0 ? "+" : "";
+      return "<div class='ev-podium-item'>"
+        + "<span class='ev-medal'>" + medals[i] + "</span>"
+        + av
+        + "<span class='ev-pname'>" + p.name + "</span>"
+        + "<span class='ev-pdelta " + (p.delta >= 0 ? "pos" : "neg") + "'>"
+        + deltaSign + fmt(p.delta) + " " + metricLabel
+        + "</span>"
+        + "</div>";
+    }).join("") + "</div>";
+  }
+
+  var toggleId = "ev-table-" + ev.id;
+  var hasMore = ev.participants && ev.participants.length > 3;
+  var showAllBtn = hasMore
+    ? "<button class='ev-show-all' onclick='toggleEvTable(\"" + toggleId + "\", this)'>Ver todos (" + ev.participants.length + ")</button>"
+    : "";
+
+  var tableHtml = "";
+  if (ev.participants && ev.participants.length > 0) {
+    tableHtml = "<div class='ev-table-wrap' id='" + toggleId + "' style='display:none'>"
+      + "<div class='table-wrap'><table>"
+      + "<thead><tr><th>#</th><th>Jugador</th><th>Inicio</th><th>" + metricLabel + "</th></tr></thead>"
+      + "<tbody>"
+      + ev.participants.map(function(p) {
+          var deltaSign = p.delta > 0 ? "+" : "";
+          var deltaClass = p.delta > 0 ? "ev-delta-pos" : (p.delta < 0 ? "ev-delta-neg" : "");
+          return "<tr>"
+            + "<td>" + p.rank + "</td>"
+            + "<td>" + p.name + "</td>"
+            + "<td style='color:var(--muted)'>" + fmt(p.trophies_start) + "</td>"
+            + "<td class='" + deltaClass + "'>" + deltaSign + fmt(p.delta) + "</td>"
+            + "</tr>";
+        }).join("")
+      + "</tbody></table></div></div>";
+  }
+
+  return "<div class='ev-card " + (isActive ? "ev-card-active" : "") + "'>"
+    + "<div class='ev-card-top'>"
+    +   "<div class='" + statusClass + "'>" + statusLabel + "</div>"
+    +   dateStr
+    + "</div>"
+    + "<div class='ev-title'>" + ev.title + "</div>"
+    + (ev.description ? "<div class='ev-desc'>" + ev.description + "</div>" : "")
+    + "<div class='ev-reward'><span class='ev-reward-label'>Recompensa</span><span class='ev-reward-val'>" + ev.reward + "</span></div>"
+    + podiumHtml
+    + showAllBtn
+    + tableHtml
+    + "</div>";
+}
+
+function toggleEvTable(id, btn) {
+  var el = document.getElementById(id);
+  if (!el) return;
+  var visible = el.style.display !== "none";
+  el.style.display = visible ? "none" : "block";
+  btn.textContent = visible
+    ? btn.textContent.replace("Ocultar", "Ver todos")
+    : btn.textContent.replace("Ver todos", "Ocultar");
+}
+
+function startEventCountdown(eventId, endsAt) {
+  var endMs = new Date(endsAt).getTime();
+  var el = document.getElementById("ev-countdown-" + eventId);
+  if (!el) return;
+
+  function tick() {
+    var now = Date.now();
+    var diff = endMs - now;
+    if (!document.getElementById("ev-countdown-" + eventId)) return; // view changed
+    if (diff <= 0) {
+      el.textContent = "Finalizando...";
+      setTimeout(loadEventos, 2000);
+      return;
+    }
+    var h = Math.floor(diff / 3600000);
+    var m = Math.floor((diff % 3600000) / 60000);
+    var s = Math.floor((diff % 60000) / 1000);
+    var pad = function(n) { return n < 10 ? "0" + n : "" + n; };
+    el.textContent = "Termina en " + (h > 0 ? h + "h " : "") + pad(m) + "m " + pad(s) + "s";
+    setTimeout(tick, 1000);
+  }
+  tick();
+}
