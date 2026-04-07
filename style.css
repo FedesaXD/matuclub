@@ -1107,3 +1107,28 @@ tbody tr:nth-child(3) td:first-child { color: #cd7f32; }
 .ev-empty-icon { font-size: 52px; margin-bottom: 16px; opacity: 0.4; }
 .ev-empty-title { font-family: var(--font-head); font-size: 20px; font-weight: 700; color: var(--muted); margin-bottom: 8px; }
 .ev-empty-sub { font-size: 14px; color: var(--muted-2); font-weight: 300; }
+
+/* ─── EVENTOS: BRAWLER BADGE ─────────────────────────── */
+.ev-brawler-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(0,180,232,0.08);
+  border: 1px solid rgba(0,180,232,0.22);
+  border-radius: var(--radius-xs);
+  padding: 5px 12px 5px 6px;
+  margin-bottom: 16px;
+}
+.ev-brawler-img {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  object-fit: cover;
+  background: var(--surface-3);
+}
+.ev-brawler-badge span {
+  font-family: var(--font-head);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent);
+}
