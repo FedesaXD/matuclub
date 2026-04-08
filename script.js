@@ -40,144 +40,6 @@ var ICONS = {
 };
 function icon(key) { return ICONS[key] || ""; }
 
-
-/* ─── RANKED SYSTEM ─────────────────────────────────── */
-// Rangos de Ranked con sus puntos mínimos (sistema actual 2025)
-// Bronze I=0, Bronze II=500, Bronze III=1000
-// Silver I=1500 ... Gold I=3000 ... Diamond I=4500 ... Mythic I=6000 ... Legendary I=7500 ... Masters I=9000 ... Pro=11250
-var RANKED_TIERS = [
-  { name: "Bronze",    tier: "I",   min: 0     },
-  { name: "Bronze",    tier: "II",  min: 500   },
-  { name: "Bronze",    tier: "III", min: 1000  },
-  { name: "Silver",    tier: "I",   min: 1500  },
-  { name: "Silver",    tier: "II",  min: 2000  },
-  { name: "Silver",    tier: "III", min: 2500  },
-  { name: "Gold",      tier: "I",   min: 3000  },
-  { name: "Gold",      tier: "II",  min: 3500  },
-  { name: "Gold",      tier: "III", min: 4000  },
-  { name: "Diamond",   tier: "I",   min: 4500  },
-  { name: "Diamond",   tier: "II",  min: 5000  },
-  { name: "Diamond",   tier: "III", min: 5500  },
-  { name: "Mythic",    tier: "I",   min: 6000  },
-  { name: "Mythic",    tier: "II",  min: 6500  },
-  { name: "Mythic",    tier: "III", min: 7000  },
-  { name: "Legendary", tier: "I",   min: 7500  },
-  { name: "Legendary", tier: "II",  min: 8250  },
-  { name: "Legendary", tier: "III", min: 9000  },
-  { name: "Masters",   tier: "I",   min: 9750  },
-  { name: "Masters",   tier: "II",  min: 10500 },
-  { name: "Masters",   tier: "III", min: 11250 },
-  { name: "Pro",       tier: "",    min: 12000 }
-];
-
-// Colores temáticos por rango
-var RANKED_COLORS = {
-  Bronze:   { bg: "#3d1f0a", border: "#b07040", text: "#e8a870", glow: "#b07040" },
-  Silver:   { bg: "#0d1a26", border: "#7090b0", text: "#b0d0e8", glow: "#7090b0" },
-  Gold:     { bg: "#2a1a00", border: "#d4a000", text: "#ffd040", glow: "#d4a000" },
-  Diamond:  { bg: "#001a2a", border: "#00aaff", text: "#80ddff", glow: "#00aaff" },
-  Mythic:   { bg: "#1a0028", border: "#aa44ff", text: "#dd99ff", glow: "#aa44ff" },
-  Legendary:{ bg: "#001a10", border: "#00dd88", text: "#88ffcc", glow: "#00dd88" },
-  Masters:  { bg: "#1a0010", border: "#ff4488", text: "#ff99cc", glow: "#ff4488" },
-  Pro:      { bg: "#0a0a20", border: "#ffdd00", text: "#fff0a0", glow: "#ffdd00" }
-};
-
-function getRankedTier(points) {
-  if (!points || points <= 0) return null;
-  var tier = RANKED_TIERS[0];
-  for (var i = 0; i < RANKED_TIERS.length; i++) {
-    if (points >= RANKED_TIERS[i].min) tier = RANKED_TIERS[i];
-    else break;
-  }
-  return tier;
-}
-
-// SVG icons exactos estilo Brawl Stars para cada categoría de rango
-function getRankedIconSvg(rankName, size) {
-  size = size || 44;
-  var s = size;
-  var h = Math.round(s / 2);
-  var icons = {
-    Bronze: '<svg viewBox="0 0 44 44" width="' + s + '" height="' + s + '" xmlns="http://www.w3.org/2000/svg">' +
-      '<defs><radialGradient id="bz_g" cx="50%" cy="35%" r="60%"><stop offset="0%" stop-color="#e8a060"/><stop offset="100%" stop-color="#7a3a10"/></radialGradient>' +
-      '<filter id="bz_sh"><feDropShadow dx="0" dy="1" stdDeviation="1.5" flood-color="#00000060"/></filter></defs>' +
-      '<polygon points="22,4 28,16 42,16 31,25 35,38 22,30 9,38 13,25 2,16 16,16" fill="url(#bz_g)" stroke="#a06030" stroke-width="1" filter="url(#bz_sh)"/>' +
-      '<polygon points="22,10 26,18 35,18 28,23 31,32 22,27 13,32 16,23 9,18 18,18" fill="#b06828" opacity="0.5"/>' +
-      '</svg>',
-    Silver: '<svg viewBox="0 0 44 44" width="' + s + '" height="' + s + '" xmlns="http://www.w3.org/2000/svg">' +
-      '<defs><radialGradient id="sv_g" cx="50%" cy="35%" r="60%"><stop offset="0%" stop-color="#e0eaf5"/><stop offset="100%" stop-color="#607090"/></radialGradient>' +
-      '<filter id="sv_sh"><feDropShadow dx="0" dy="1" stdDeviation="1.5" flood-color="#00000060"/></filter></defs>' +
-      '<polygon points="22,4 28,16 42,16 31,25 35,38 22,30 9,38 13,25 2,16 16,16" fill="url(#sv_g)" stroke="#80a0c0" stroke-width="1" filter="url(#sv_sh)"/>' +
-      '<polygon points="22,10 26,18 35,18 28,23 31,32 22,27 13,32 16,23 9,18 18,18" fill="#a0b8d0" opacity="0.4"/>' +
-      '</svg>',
-    Gold: '<svg viewBox="0 0 44 44" width="' + s + '" height="' + s + '" xmlns="http://www.w3.org/2000/svg">' +
-      '<defs><radialGradient id="gd_g" cx="50%" cy="30%" r="65%"><stop offset="0%" stop-color="#fff080"/><stop offset="60%" stop-color="#e0a000"/><stop offset="100%" stop-color="#805000"/></radialGradient>' +
-      '<filter id="gd_sh"><feDropShadow dx="0" dy="1" stdDeviation="2" flood-color="#80500080"/></filter></defs>' +
-      '<polygon points="22,4 28,16 42,16 31,25 35,38 22,30 9,38 13,25 2,16 16,16" fill="url(#gd_g)" stroke="#c08000" stroke-width="1.2" filter="url(#gd_sh)"/>' +
-      '<polygon points="22,10 26,18 35,18 28,23 31,32 22,27 13,32 16,23 9,18 18,18" fill="#ffe060" opacity="0.45"/>' +
-      '</svg>',
-    Diamond: '<svg viewBox="0 0 44 44" width="' + s + '" height="' + s + '" xmlns="http://www.w3.org/2000/svg">' +
-      '<defs><linearGradient id="dm_g" x1="30%" y1="0%" x2="70%" y2="100%"><stop offset="0%" stop-color="#a0eeff"/><stop offset="50%" stop-color="#0090e0"/><stop offset="100%" stop-color="#004080"/></linearGradient>' +
-      '<filter id="dm_sh"><feDropShadow dx="0" dy="1" stdDeviation="2" flood-color="#0060c080"/></filter></defs>' +
-      '<polygon points="22,3 38,13 38,31 22,41 6,31 6,13" fill="url(#dm_g)" stroke="#40c0ff" stroke-width="1.2" filter="url(#dm_sh)"/>' +
-      '<polygon points="22,10 32,16 32,28 22,34 12,28 12,16" fill="#80d8ff" opacity="0.25"/>' +
-      '<line x1="22" y1="3" x2="22" y2="41" stroke="#c0eeff" stroke-width="0.8" opacity="0.5"/>' +
-      '<line x1="6" y1="13" x2="38" y2="31" stroke="#c0eeff" stroke-width="0.8" opacity="0.3"/>' +
-      '<line x1="38" y1="13" x2="6" y2="31" stroke="#c0eeff" stroke-width="0.8" opacity="0.3"/>' +
-      '</svg>',
-    Mythic: '<svg viewBox="0 0 44 44" width="' + s + '" height="' + s + '" xmlns="http://www.w3.org/2000/svg">' +
-      '<defs><radialGradient id="my_g" cx="50%" cy="40%" r="60%"><stop offset="0%" stop-color="#e080ff"/><stop offset="100%" stop-color="#500090"/></radialGradient>' +
-      '<filter id="my_sh"><feDropShadow dx="0" dy="2" stdDeviation="2.5" flood-color="#8000ff60"/></filter></defs>' +
-      '<path d="M22 3 L32 12 L42 10 L38 20 L44 28 L34 28 L29 40 L22 33 L15 40 L10 28 L0 28 L6 20 L2 10 L12 12 Z" fill="url(#my_g)" stroke="#c060ff" stroke-width="1.2" filter="url(#my_sh)"/>' +
-      '<circle cx="22" cy="21" r="6" fill="#d090ff" opacity="0.4"/>' +
-      '<circle cx="22" cy="21" r="3" fill="#ffffff" opacity="0.3"/>' +
-      '</svg>',
-    Legendary: '<svg viewBox="0 0 44 44" width="' + s + '" height="' + s + '" xmlns="http://www.w3.org/2000/svg">' +
-      '<defs><radialGradient id="lg_g" cx="50%" cy="35%" r="65%"><stop offset="0%" stop-color="#80ffcc"/><stop offset="60%" stop-color="#00c070"/><stop offset="100%" stop-color="#005030"/></radialGradient>' +
-      '<filter id="lg_sh"><feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#00ff8860"/></filter></defs>' +
-      '<path d="M22 2 L26 10 L35 7 L32 16 L41 18 L35 24 L38 33 L29 31 L26 40 L22 34 L18 40 L15 31 L6 33 L9 24 L3 18 L12 16 L9 7 L18 10 Z" fill="url(#lg_g)" stroke="#00e888" stroke-width="1.2" filter="url(#lg_sh)"/>' +
-      '<circle cx="22" cy="21" r="5" fill="#88ffd0" opacity="0.5"/>' +
-      '<path d="M22 15 L24 20 L29 20 L25 23 L27 28 L22 25 L17 28 L19 23 L15 20 L20 20 Z" fill="#ffffff" opacity="0.4"/>' +
-      '</svg>',
-    Masters: '<svg viewBox="0 0 44 44" width="' + s + '" height="' + s + '" xmlns="http://www.w3.org/2000/svg">' +
-      '<defs><radialGradient id="ms_g" cx="50%" cy="30%" r="70%"><stop offset="0%" stop-color="#ffaadd"/><stop offset="50%" stop-color="#ee2277"/><stop offset="100%" stop-color="#700030"/></radialGradient>' +
-      '<filter id="ms_glow"><feGaussianBlur stdDeviation="2" result="blur"/><feComposite in="SourceGraphic" in2="blur"/></filter>' +
-      '<filter id="ms_sh"><feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#ff006080"/></filter></defs>' +
-      '<path d="M22 2 C30 2 40 10 42 20 C44 30 38 40 28 42 C18 44 6 38 3 28 C0 18 6 4 22 2Z" fill="url(#ms_g)" stroke="#ff60aa" stroke-width="1.5" filter="url(#ms_sh)"/>' +
-      '<path d="M22 8 L25 16 L34 16 L27 22 L30 30 L22 25 L14 30 L17 22 L10 16 L19 16 Z" fill="#ffddee" opacity="0.6"/>' +
-      '<circle cx="22" cy="22" r="4" fill="#ffffff" opacity="0.35"/>' +
-      '</svg>',
-    Pro: '<svg viewBox="0 0 44 44" width="' + s + '" height="' + s + '" xmlns="http://www.w3.org/2000/svg">' +
-      '<defs><radialGradient id="pr_g" cx="50%" cy="30%" r="70%"><stop offset="0%" stop-color="#ffffa0"/><stop offset="40%" stop-color="#ffcc00"/><stop offset="100%" stop-color="#806000"/></radialGradient>' +
-      '<radialGradient id="pr_g2" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#ffffff"/><stop offset="100%" stop-color="#ffee88"/></radialGradient>' +
-      '<filter id="pr_sh"><feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#ffcc0080"/></filter></defs>' +
-      '<path d="M22 1 L27 9 L36 4 L35 14 L44 15 L38 22 L43 30 L33 30 L30 40 L22 35 L14 40 L11 30 L1 30 L6 22 L0 15 L9 14 L8 4 L17 9 Z" fill="url(#pr_g)" stroke="#e0a800" stroke-width="1.5" filter="url(#pr_sh)"/>' +
-      '<path d="M22 9 L25 17 L34 17 L27 22 L30 31 L22 26 L14 31 L17 22 L10 17 L19 17 Z" fill="url(#pr_g2)" opacity="0.55"/>' +
-      '<circle cx="22" cy="22" r="5" fill="#ffffff" opacity="0.3"/>' +
-      '</svg>'
-  };
-  return icons[rankName] || icons["Bronze"];
-}
-
-function renderRankedBadge(points, label) {
-  if (!points || points <= 0) {
-    return "<div class=\"ranked-empty\"><span class=\"ranked-empty-label\">" + label + "</span><span class=\"ranked-empty-val\">Sin datos</span></div>";
-  }
-  var tier = getRankedTier(points);
-  if (!tier) return "";
-  var col = RANKED_COLORS[tier.name] || RANKED_COLORS["Bronze"];
-  var tierLabel = tier.name === "Pro" ? "Pro" : tier.name + " " + tier.tier;
-  var svgIcon = getRankedIconSvg(tier.name, 48);
-  return "<div class=\"ranked-badge\" style=\"background:" + col.bg + ";border-color:" + col.border + ";box-shadow:0 0 10px " + col.glow + "40\">" +
-    "<div class=\"ranked-badge-label\">" + label + "</div>" +
-    "<div class=\"ranked-badge-body\">" +
-    svgIcon +
-    "<div class=\"ranked-badge-info\">" +
-    "<div class=\"ranked-badge-tier\" style=\"color:" + col.text + "\">" + tierLabel + "</div>" +
-    "<div class=\"ranked-badge-pts\">" + fmt(points) + " pts</div>" +
-    "</div></div></div>";
-}
-
 /* ─── UTILS ──────────────────────────────────────────── */
 function showView(id) {
   document.querySelectorAll(".view").forEach(function(v) { v.classList.remove("active"); });
@@ -221,6 +83,18 @@ function renderSkeleton(rows, type) {
 
 /* ─── TOP JUGADORES ─────────────────────────────────── */
 var topCache = {};
+var CACHE_TTL = 5 * 60 * 1000; // 5 minutos en ms
+
+function cacheSet(key, data) {
+  topCache[key] = { data: data, ts: Date.now() };
+}
+
+function cacheGet(key) {
+  var entry = topCache[key];
+  if (!entry) return null;
+  if (Date.now() - entry.ts > CACHE_TTL) { delete topCache[key]; return null; }
+  return entry.data;
+}
 var TOP_CONFIG = {
   "prestige":         { col: "Prestige",      extra: null },
   "trophies":         { col: "Trofeos",        extra: null },
@@ -233,11 +107,12 @@ var TOP_CONFIG = {
 function loadTop(topKey) {
   var container = document.getElementById("topList");
   if (!container) return;
-  if (topCache[topKey]) { renderTop(topKey, topCache[topKey]); return; }
+  var cached = cacheGet(topKey);
+  if (cached) { renderTop(topKey, cached); return; }
   container.innerHTML = renderSkeleton(10, "table");
   fetch(API + "/top/" + topKey)
     .then(function(res) { return res.json(); })
-    .then(function(data) { topCache[topKey] = data; renderTop(topKey, data); })
+    .then(function(data) { cacheSet(topKey, data); renderTop(topKey, data); })
     .catch(function() { container.innerHTML = "<div class='loading'>Error al cargar datos</div>"; });
 }
 
@@ -383,12 +258,7 @@ function fetchPlayerByTag(tag) {
         +     "<div class='stat-val stat-val-img'><img src='3v3.webp' class='stat-asset-img'>" + fmt(data.wins3v3) + "</div></div>"
         +   "<div class='stat-box'><div class='stat-label'>Victorias Solo</div>"
         +     "<div class='stat-val stat-val-img'><img src='showdown.webp' class='stat-asset-img'>" + fmt(data.winsSolo) + "</div></div>"
-        + "</div>"
-        + "<div class='ranked-row'>"
-        +   renderRankedBadge(data.highest_ranked_points, "Rango máximo")
-        +   renderRankedBadge(data.current_ranked_points, "Rango actual")
-        + "</div>"
-        + "</div>";
+        + "</div></div>";
 
       if (data.history && data.history.length > 1) {
         historyData = {
@@ -550,6 +420,33 @@ document.addEventListener("click", function(e) {
 });
 
 /* ─── INIT ───────────────────────────────────────────── */
+/* ─── STATUS / ÚLTIMA ACTUALIZACIÓN ─────────────────── */
+function loadStatus() {
+  fetch(API + "/status")
+    .then(function(res) { return res.json(); })
+    .then(function(data) {
+      if (!data.last_updated) return;
+      var el = document.getElementById("last-updated");
+      if (!el) return;
+      var date = new Date(data.last_updated);
+      var now = new Date();
+      var diffMs = now - date;
+      var diffMin = Math.floor(diffMs / 60000);
+      var text;
+      if (diffMin < 1) {
+        text = "hace menos de 1 min";
+      } else if (diffMin < 60) {
+        text = "hace " + diffMin + " min";
+      } else {
+        var diffH = Math.floor(diffMin / 60);
+        text = "hace " + diffH + "h " + (diffMin % 60) + "min";
+      }
+      el.textContent = "Datos actualizados " + text;
+      el.style.display = "block";
+    })
+    .catch(function() {});
+}
+
 document.addEventListener("DOMContentLoaded", function() {
 
   // Navegacion principal
@@ -636,6 +533,7 @@ document.addEventListener("DOMContentLoaded", function() {
   });
 
   loadBrawlerImages();
+  loadStatus();
 
   // Eventos
   document.getElementById("btn-eventos").addEventListener("click", function() {
