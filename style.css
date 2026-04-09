@@ -868,6 +868,59 @@ tbody tr:nth-child(3) td:first-child { color: #cd7f32; }
   color: var(--accent);
 }
 
+/* ─── TOP FILTERS ─────────────────────────────────────── */
+.top-filters {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+.top-filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+  min-width: 160px;
+}
+.top-filter-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding-left: 2px;
+}
+.top-select-wrap {
+  position: relative;
+}
+.top-select {
+  width: 100%;
+  appearance: none;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 36px 10px 14px;
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.2s, background 0.2s;
+}
+.top-select:hover  { border-color: var(--border-glow); }
+.top-select:focus  { border-color: rgba(0,212,255,0.45); background: var(--surface-3); }
+.top-select option { background: var(--surface-2); color: var(--text); }
+.top-select-arrow {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--muted);
+  font-size: 12px;
+  pointer-events: none;
+}
+
 /* ─── MEMBER LIST ────────────────────────────────────── */
 .member-row {
   display: flex;
@@ -1131,81 +1184,4 @@ tbody tr:nth-child(3) td:first-child { color: #cd7f32; }
   font-size: 13px;
   font-weight: 600;
   color: var(--accent);
-}
-
-/* ─── RANKED BADGES ──────────────────────────────────── */
-.ranked-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin-top: 16px;
-  padding-top: 16px;
-  border-top: 1px solid rgba(0,160,255,0.1);
-}
-.ranked-badge {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  border: 1.5px solid;
-  border-radius: 12px;
-  padding: 12px 14px;
-  transition: transform 0.15s;
-}
-.ranked-badge:hover { transform: translateY(-2px); }
-.ranked-badge-label {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
-  color: var(--muted);
-  margin-bottom: 2px;
-}
-.ranked-badge-body {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.ranked-badge-body svg {
-  flex-shrink: 0;
-  filter: drop-shadow(0 1px 3px rgba(0,0,0,0.5));
-}
-.ranked-badge-info {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-.ranked-badge-tier {
-  font-family: var(--font-head);
-  font-size: 15px;
-  font-weight: 800;
-  line-height: 1.1;
-}
-.ranked-badge-pts {
-  font-size: 12px;
-  color: var(--muted);
-  font-weight: 600;
-}
-.ranked-empty {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  border: 1.5px solid rgba(255,255,255,0.06);
-  border-radius: 12px;
-  padding: 14px;
-  opacity: 0.5;
-}
-.ranked-empty-label {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
-  color: var(--muted);
-}
-.ranked-empty-val {
-  font-size: 13px;
-  color: var(--muted-2);
-}
-@media (max-width: 420px) {
-  .ranked-row { grid-template-columns: 1fr; }
-  .ranked-badge-tier { font-size: 13px; }
 }
