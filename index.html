@@ -22,6 +22,31 @@
       </div>
       <h1>Matu<span>club</span></h1>
       <p class="subtitle">Página oficial de Matuclub, el mejor club de Uruguay</p>
+
+      <!-- JUGADOR DEL DÍA -->
+      <div id="pod-home-card" class="pod-home-card" style="display:none">
+        <div class="pod-home-label">⭐ Jugador del día</div>
+        <div class="pod-home-inner">
+          <img id="pod-home-avatar" class="pod-home-avatar" src="" alt="" onerror="this.style.display='none'"/>
+          <div class="pod-home-info">
+            <span id="pod-home-name" class="pod-home-name"></span>
+            <span id="pod-home-club" class="pod-home-club"></span>
+            <span id="pod-home-pts" class="pod-home-pts"></span>
+          </div>
+          <button class="pod-home-btn" id="btn-pod-ver">Ver historial →</button>
+        </div>
+      </div>
+      <div id="pod-home-skeleton" class="pod-home-card pod-skeleton">
+        <div class="pod-home-label">⭐ Jugador del día</div>
+        <div class="pod-home-inner">
+          <div class="skel skel-avatar"></div>
+          <div class="pod-home-info">
+            <div class="skel skel-lg" style="margin-bottom:6px"></div>
+            <div class="skel skel-sm"></div>
+          </div>
+        </div>
+      </div>
+
       <nav class="nav-cards">
         <button class="nav-card" id="btn-player">
           <div class="nav-card-icon">
@@ -86,34 +111,13 @@
       </h2>
     </header>
     <div class="content-area">
-      <div class="top-filters">
-        <div class="top-filter-group">
-          <label class="top-filter-label">Métrica</label>
-          <div class="top-select-wrap">
-            <select id="top-metric-select" class="top-select">
-              <option value="prestige">Prestige</option>
-              <option value="trophies">Trofeos</option>
-              <option value="wins3v3">Victorias 3v3</option>
-              <option value="winssolo">Victorias Solo</option>
-              <option value="winstreak">Racha</option>
-              <option value="brawler-trophies">Mejor Brawler</option>
-            </select>
-            <span class="top-select-arrow">▾</span>
-          </div>
-        </div>
-        <div class="top-filter-group">
-          <label class="top-filter-label">Club</label>
-          <div class="top-select-wrap">
-            <select id="top-club-select" class="top-select">
-              <option value="">Todos los clubs</option>
-              <option value="1">Matuclub 1</option>
-              <option value="2">Matuclub 2</option>
-              <option value="3">Matuclub 3</option>
-              <option value="4">Matuclub 4</option>
-            </select>
-            <span class="top-select-arrow">▾</span>
-          </div>
-        </div>
+      <div class="player-tabs-bar">
+        <button class="top-tab active" data-top="prestige">Prestige</button>
+        <button class="top-tab" data-top="trophies">Trofeos</button>
+        <button class="top-tab" data-top="wins3v3">Victorias 3v3</button>
+        <button class="top-tab" data-top="winssolo">Victorias Solo</button>
+        <button class="top-tab" data-top="winstreak">Racha</button>
+        <button class="top-tab" data-top="brawler-trophies">Mejor Brawler</button>
       </div>
       <div id="topList"></div>
     </div>
@@ -211,6 +215,20 @@
     </header>
     <div class="content-area">
       <div id="eventosContent"></div>
+    </div>
+  </div>
+
+  <!-- JUGADOR DEL DÍA - HISTORIAL -->
+  <div id="pod" class="view">
+    <header class="page-header">
+      <button class="back-btn" id="btn-back-pod"><span>←</span> Volver</button>
+      <h2><span style="font-size:22px;margin-right:6px">⭐</span>Jugador del día</h2>
+    </header>
+    <div class="content-area">
+      <p class="pod-desc">El jugador que más méritos acumuló cada día.<br>
+        <span class="pod-desc-pts">1 trofeo = 1pt &nbsp;·&nbsp; 1 victoria = 4pts &nbsp;·&nbsp; 1 prestige = 80pts</span>
+      </p>
+      <div id="podList"></div>
     </div>
   </div>
 
