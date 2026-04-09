@@ -83,18 +83,18 @@ function renderSkeleton(rows, type) {
 
 /* ─── TOP JUGADORES ─────────────────────────────────── */
 var topCache = {};
-var CACHE_TTL = 5 * 60 * 1000; // 5 minutos en ms
+var CACHE_TTL = 5 * 60 * 1000;
 
 function cacheSet(key, data) {
   topCache[key] = { data: data, ts: Date.now() };
 }
-
 function cacheGet(key) {
   var entry = topCache[key];
   if (!entry) return null;
   if (Date.now() - entry.ts > CACHE_TTL) { delete topCache[key]; return null; }
   return entry.data;
 }
+
 var TOP_CONFIG = {
   "prestige":         { col: "Prestige",      extra: null },
   "trophies":         { col: "Trofeos",        extra: null },
@@ -104,16 +104,29 @@ var TOP_CONFIG = {
   "brawler-trophies": { col: "Trofeos",        extra: "brawler" }
 };
 
-function loadTop(topKey) {
+function getTopSelections() {
+  var metric = (document.getElementById("top-metric-select") || {}).value || "prestige";
+  var club   = (document.getElementById("top-club-select")  || {}).value || "";
+  return { metric: metric, club: club };
+}
+
+function loadTop(topKey, club) {
   var container = document.getElementById("topList");
   if (!container) return;
-  var cached = cacheGet(topKey);
+  var cacheKey = topKey + (club ? "__" + club : "");
+  var cached = cacheGet(cacheKey);
   if (cached) { renderTop(topKey, cached); return; }
   container.innerHTML = renderSkeleton(10, "table");
-  fetch(API + "/top/" + topKey)
+  var url = API + "/top/" + topKey + (club ? "?club=" + club : "");
+  fetch(url)
     .then(function(res) { return res.json(); })
-    .then(function(data) { cacheSet(topKey, data); renderTop(topKey, data); })
+    .then(function(data) { cacheSet(cacheKey, data); renderTop(topKey, data); })
     .catch(function() { container.innerHTML = "<div class='loading'>Error al cargar datos</div>"; });
+}
+
+function loadTopFromSelects() {
+  var sel = getTopSelections();
+  loadTop(sel.metric, sel.club);
 }
 
 function renderTop(topKey, data) {
@@ -389,14 +402,7 @@ document.addEventListener("click", function(e) {
   var row = e.target.closest("tr[data-tag]");
   if (row) { goToPlayer(row.getAttribute("data-tag")); return; }
 
-  // Tabs de top jugadores
-  var topTab = e.target.closest(".top-tab");
-  if (topTab) {
-    document.querySelectorAll(".top-tab").forEach(function(t) { t.classList.remove("active"); });
-    topTab.classList.add("active");
-    loadTop(topTab.getAttribute("data-top"));
-    return;
-  }
+  // Tabs de top jugadores — reemplazado por dropdowns, no hay listener de tabs
 
   // Tabs de clubs
   var playerTab = e.target.closest(".player-tab");
@@ -420,42 +426,17 @@ document.addEventListener("click", function(e) {
 });
 
 /* ─── INIT ───────────────────────────────────────────── */
-/* ─── STATUS / ÚLTIMA ACTUALIZACIÓN ─────────────────── */
-function loadStatus() {
-  fetch(API + "/status")
-    .then(function(res) { return res.json(); })
-    .then(function(data) {
-      if (!data.last_updated) return;
-      var el = document.getElementById("last-updated");
-      if (!el) return;
-      var date = new Date(data.last_updated);
-      var now = new Date();
-      var diffMs = now - date;
-      var diffMin = Math.floor(diffMs / 60000);
-      var text;
-      if (diffMin < 1) {
-        text = "hace menos de 1 min";
-      } else if (diffMin < 60) {
-        text = "hace " + diffMin + " min";
-      } else {
-        var diffH = Math.floor(diffMin / 60);
-        text = "hace " + diffH + "h " + (diffMin % 60) + "min";
-      }
-      el.textContent = "Datos actualizados " + text;
-      el.style.display = "block";
-    })
-    .catch(function() {});
-}
-
 document.addEventListener("DOMContentLoaded", function() {
 
   // Navegacion principal
   document.getElementById("btn-prestige").addEventListener("click", function() {
     showView("prestige");
-    document.querySelectorAll(".top-tab").forEach(function(t) { t.classList.remove("active"); });
-    document.querySelector(".top-tab[data-top='prestige']").classList.add("active");
-    loadTop("prestige");
+    loadTopFromSelects();
   });
+
+  // Dropdowns de top
+  document.getElementById("top-metric-select").addEventListener("change", loadTopFromSelects);
+  document.getElementById("top-club-select").addEventListener("change", loadTopFromSelects);
 
   document.getElementById("btn-player").addEventListener("click", function() {
     showView("player");
@@ -533,7 +514,6 @@ document.addEventListener("DOMContentLoaded", function() {
   });
 
   loadBrawlerImages();
-  loadStatus();
 
   // Eventos
   document.getElementById("btn-eventos").addEventListener("click", function() {
