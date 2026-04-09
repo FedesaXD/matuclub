@@ -142,7 +142,7 @@ function loadClubMembers(clubNum) {
 function renderClubMembers(data) {
   var rows = data.map(function(m) {
     var av = m.icon_url
-      ? "<img src='" + m.icon_url + "' class='member-avatar' onerror='this.style.display=\"none\"'>"
+      ? "<img src='" + m.icon_url + "' class='member-avatar' onerror='this.onerror=null;this.src=\"\";this.classList.add(\"member-avatar-ph\")'>"
       : "<div class='member-avatar member-avatar-ph'></div>";
     return "<tr class='clickable-row' data-tag='" + m.tag + "' style='cursor:pointer'>"
       + "<td class='td-rank'>" + m.rank + "</td>"
@@ -585,7 +585,7 @@ function renderEventCard(ev) {
     podiumHtml = "<div class='ev-podium'>" + topParticipants.map(function(p, i) {
       var medals = ["🥇","🥈","🥉"];
       var av = p.icon_url
-        ? "<img src='" + p.icon_url + "' class='ev-avatar' onerror='this.style.display=\"none\"'>"
+        ? "<img src='" + p.icon_url + "' class='ev-avatar' onerror='this.onerror=null;this.src=\"\";this.classList.add(\"ev-avatar-ph\")'>"
         : "<div class='ev-avatar ev-avatar-ph'></div>";
       var deltaSign = p.delta > 0 ? "+" : "";
       return "<div class='ev-podium-item'>"
@@ -609,7 +609,7 @@ function renderEventCard(ev) {
   if (ev.participants && ev.participants.length > 0) {
     tableHtml = "<div class='ev-table-wrap' id='" + toggleId + "' style='display:none'>"
       + "<div class='table-wrap'><table>"
-      + "<thead><tr><th>#</th><th>Jugador</th><th>Inicio</th><th>" + metricLabel + "</th></tr></thead>"
+      + "<thead><tr><th>#</th><th>Jugador</th><th>" + metricLabel + "</th></tr></thead>"
       + "<tbody>"
       + ev.participants.map(function(p) {
           var deltaSign = p.delta > 0 ? "+" : "";
@@ -617,7 +617,6 @@ function renderEventCard(ev) {
           return "<tr>"
             + "<td>" + p.rank + "</td>"
             + "<td>" + p.name + "</td>"
-            + "<td style='color:var(--muted)'>" + fmt(p.value_start) + "</td>"
             + "<td class='" + deltaClass + "'>" + deltaSign + fmt(p.delta) + "</td>"
             + "</tr>";
         }).join("")
@@ -673,6 +672,28 @@ function startEventCountdown(eventId, endsAt) {
   tick();
 }
 
+/* ─── TIEMPO RELATIVO ────────────────────────────────── */
+function timeAgo(isoStr) {
+  if (!isoStr) return null;
+  var then = new Date(isoStr).getTime();
+  if (isNaN(then)) return null;
+  var diff = Math.floor((Date.now() - then) / 1000);
+  if (diff < 60)  return "Datos actualizados hace " + diff + " segundo" + (diff === 1 ? "" : "s");
+  var m = Math.floor(diff / 60);
+  if (m < 60)    return "Datos actualizados hace " + m + " minuto" + (m === 1 ? "" : "s");
+  var h = Math.floor(m / 60);
+  if (h < 24)    return "Datos actualizados hace " + h + " hora" + (h === 1 ? "" : "s");
+  var d = Math.floor(h / 24);
+  return "Datos actualizados hace " + d + " día" + (d === 1 ? "" : "s");
+}
+
+function showLastUpdated(isoStr) {
+  var el = document.getElementById("home-last-updated");
+  if (!el) return;
+  var text = timeAgo(isoStr);
+  if (text) { el.textContent = text; el.style.display = "block"; }
+}
+
 /* ─── JUGADOR DEL DÍA ────────────────────────────────── */
 var podData = null;
 
@@ -690,7 +711,16 @@ function loadPlayerOfDay() {
       podData = data;
       skeleton.style.display = "none";
 
-      var today = data.find(function(d) { return d.is_today; });
+      // Show last_updated in home if available
+      var arr = Array.isArray(data) ? data : (data.data || []);
+      var meta = !Array.isArray(data) ? data : null;
+      var updatedAt = (meta && (meta.last_updated || meta.updated_at))
+        || (arr[0] && (arr[0].last_updated || arr[0].updated_at))
+        || null;
+      showLastUpdated(updatedAt);
+      if (Array.isArray(data)) { podData = data; } else { podData = arr; }
+
+      var today = podData.find(function(d) { return d.is_today; });
       if (!today) return;
 
       document.getElementById("pod-home-avatar").src = today.icon_url || "";
@@ -725,7 +755,7 @@ function renderPodList() {
     var label = d.is_today ? "⭐ Hoy — " + dateStr : dateStr;
 
     var avatar = d.icon_url
-      ? "<img class='pod-card-avatar' src='" + d.icon_url + "' onerror='this.style.display=\"none\"'>"
+      ? "<img class='pod-card-avatar' src='" + d.icon_url + "' onerror='this.onerror=null;this.src=\"\";this.classList.add(\"pod-card-avatar-ph\")'>"
       : "<div class='pod-card-avatar'></div>";
 
     var deltas = [];
