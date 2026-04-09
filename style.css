@@ -114,7 +114,15 @@ h1 span {
   font-size: 15px;
   font-weight: 300;
   color: var(--muted);
-  margin-bottom: 52px;
+  margin-bottom: 8px;
+}
+.subtitle-updated {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--muted);
+  opacity: 0.7;
+  margin-bottom: 44px;
+  letter-spacing: 0.02em;
 }
 
 /* ─── NAV CARDS ───────────────────────────────────────── */
@@ -148,6 +156,14 @@ h1 span {
   object-fit: cover;
   background: var(--surface-3);
   flex-shrink: 0;
+}
+.pod-home-avatar-ph {
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  background: var(--surface-3);
+  flex-shrink: 0;
+  object-fit: unset;
 }
 .pod-home-info {
   flex: 1;
@@ -212,6 +228,14 @@ h1 span {
   object-fit: cover;
   background: var(--surface-3);
   flex-shrink: 0;
+}
+.pod-card-avatar-ph {
+  width: 52px;
+  height: 52px;
+  border-radius: 10px;
+  background: var(--surface-3);
+  flex-shrink: 0;
+  object-fit: unset;
 }
 .pod-card-info { flex: 1; }
 .pod-card-date {
