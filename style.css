@@ -163,7 +163,6 @@ h1 span {
   border-radius: 10px;
   background: var(--surface-3);
   flex-shrink: 0;
-  object-fit: unset;
 }
 .pod-home-info {
   flex: 1;
@@ -235,7 +234,6 @@ h1 span {
   border-radius: 10px;
   background: var(--surface-3);
   flex-shrink: 0;
-  object-fit: unset;
 }
 .pod-card-info { flex: 1; }
 .pod-card-date {
