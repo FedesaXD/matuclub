@@ -142,7 +142,7 @@ function loadClubMembers(clubNum) {
 function renderClubMembers(data) {
   var rows = data.map(function(m) {
     var av = m.icon_url
-      ? "<img src='" + m.icon_url + "' class='member-avatar' onerror='this.onerror=null;this.src=\"\";this.classList.add(\"member-avatar-ph\")'>"
+      ? "<img src='" + m.icon_url + "' class='member-avatar' onerror='this.onerror=null;this.outerHTML=\"<div class=\\\"member-avatar member-avatar-ph\\\"></div>\"'>"
       : "<div class='member-avatar member-avatar-ph'></div>";
     return "<tr class='clickable-row' data-tag='" + m.tag + "' style='cursor:pointer'>"
       + "<td class='td-rank'>" + m.rank + "</td>"
@@ -585,7 +585,7 @@ function renderEventCard(ev) {
     podiumHtml = "<div class='ev-podium'>" + topParticipants.map(function(p, i) {
       var medals = ["🥇","🥈","🥉"];
       var av = p.icon_url
-        ? "<img src='" + p.icon_url + "' class='ev-avatar' onerror='this.onerror=null;this.src=\"\";this.classList.add(\"ev-avatar-ph\")'>"
+        ? "<img src='" + p.icon_url + "' class='ev-avatar' onerror='this.onerror=null;this.outerHTML=\"<div class=\\\"ev-avatar ev-avatar-ph\\\"></div>\"'>"
         : "<div class='ev-avatar ev-avatar-ph'></div>";
       var deltaSign = p.delta > 0 ? "+" : "";
       return "<div class='ev-podium-item'>"
@@ -755,7 +755,7 @@ function renderPodList() {
     var label = d.is_today ? "⭐ Hoy — " + dateStr : dateStr;
 
     var avatar = d.icon_url
-      ? "<img class='pod-card-avatar' src='" + d.icon_url + "' onerror='this.onerror=null;this.src=\"\";this.classList.add(\"pod-card-avatar-ph\")'>"
+      ? "<img class='pod-card-avatar' src='" + d.icon_url + "' onerror='this.onerror=null;this.outerHTML=\"<div class=\\\"pod-card-avatar pod-card-avatar-ph\\\"></div>\"'>"
       : "<div class='pod-card-avatar'></div>";
 
     var deltas = [];
