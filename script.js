@@ -723,7 +723,11 @@ function loadPlayerOfDay() {
       var today = podData.find(function(d) { return d.is_today; });
       if (!today) return;
 
-      document.getElementById("pod-home-avatar").src = today.icon_url || "";
+      var podAvatar = document.getElementById("pod-home-avatar");
+      var podAvatarPh = podAvatar.nextElementSibling;
+      podAvatar.style.display = "";
+      if (podAvatarPh) podAvatarPh.style.display = "none";
+      podAvatar.src = today.icon_url || "";
       document.getElementById("pod-home-name").textContent  = today.player_name;
       document.getElementById("pod-home-club").textContent  = today.club_name || "";
       document.getElementById("pod-home-pts").textContent   = today.points + " puntos hoy";
