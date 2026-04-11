@@ -706,6 +706,69 @@ var podData = null;      // { last_updated, today_ranking[], history[] }
 var podActiveTab = "hoy";
 
 /* ─── JUGADOR DEL DÍA: CARGA ────────────────────────── */
+/* ─── HOME LOADER ────────────────────────────────────── */
+(function() {
+  var bar        = document.getElementById("home-loader-bar");
+  var loader     = document.getElementById("home-loader");
+  var content    = document.getElementById("home-content");
+  var msgEl      = document.getElementById("home-loader-msg");
+  var rafId      = null;
+  var startTime  = Date.now();
+
+  // Fase 1: avanzar rápido hasta 80% en ~3s (simula respuesta normal)
+  // Fase 2: avanzar lento de 80% a 92% mientras esperamos (servidor dormido)
+  // Fase 3: al llegar la respuesta, saltar a 100% y ocultar el loader
+  var progress = 0;
+
+  function easeProgress() {
+    var elapsed = (Date.now() - startTime) / 1000; // segundos
+
+    if (progress < 80) {
+      // Fase 1: rápido, llega a 80% en ~3s
+      progress = Math.min(80, elapsed / 3 * 80);
+    } else if (progress < 92) {
+      // Fase 2: lento, sube ~1% cada segundo
+      progress = Math.min(92, 80 + (elapsed - 3) * 1);
+    }
+    // Fase 3: la maneja completeLoader()
+
+    if (bar) bar.style.width = progress + "%";
+
+    // Actualizar mensaje según el tiempo
+    if (msgEl) {
+      if (elapsed < 5) {
+        msgEl.textContent = "Cargando página, un momento...";
+      } else if (elapsed < 15) {
+        msgEl.textContent = "Despertando el servidor, casi listo...";
+      } else {
+        msgEl.textContent = "Tardando un poco más de lo normal, aguantá...";
+      }
+    }
+
+    if (progress < 92) rafId = requestAnimationFrame(easeProgress);
+  }
+
+  rafId = requestAnimationFrame(easeProgress);
+
+  // Exponer función para que loadPlayerOfDay la llame al terminar
+  window._completeHomeLoader = function() {
+    cancelAnimationFrame(rafId);
+    if (bar) bar.style.width = "100%";
+
+    // Esperar que la barra llegue visualmente al 100% antes de ocultar
+    setTimeout(function() {
+      if (loader) {
+        loader.classList.add("loader-done");
+        // Remover del DOM tras la animación para que no ocupe espacio
+        setTimeout(function() {
+          loader.style.display = "none";
+        }, 550);
+      }
+      if (content) content.classList.add("content-visible");
+    }, 350);
+  };
+})();
+
 function loadPlayerOfDay() {
   var card     = document.getElementById("pod-home-card");
   var skeleton = document.getElementById("pod-home-skeleton");
@@ -725,21 +788,26 @@ function loadPlayerOfDay() {
 
       // Card del home: usar el #1 del ranking de hoy
       var ranking = data.today_ranking || [];
-      if (!ranking.length) return;
-      var top = ranking[0];
+      if (ranking.length) {
+        var top = ranking[0];
+        var avatarEl = document.getElementById("pod-home-avatar");
+        var avatarPhEl = avatarEl.nextElementSibling;
+        avatarEl.style.display = "";
+        if (avatarPhEl) avatarPhEl.style.display = "none";
+        avatarEl.src = top.icon_url || "";
+        document.getElementById("pod-home-name").textContent = top.player_name;
+        document.getElementById("pod-home-club").textContent = top.club_name || "";
+        document.getElementById("pod-home-pts").textContent  = top.points + " puntos hoy";
+        card.style.display = "block";
+      }
 
-      var podAvatar = document.getElementById("pod-home-avatar");
-      var podAvatarPh = podAvatar.nextElementSibling;
-      podAvatar.style.display = "";
-      if (podAvatarPh) podAvatarPh.style.display = "none";
-      podAvatar.src = top.icon_url || "";
-      document.getElementById("pod-home-name").textContent = top.player_name;
-      document.getElementById("pod-home-club").textContent = top.club_name || "";
-      document.getElementById("pod-home-pts").textContent  = top.points + " puntos hoy";
-      card.style.display = "block";
+      // Completar el loader siempre, haya o no datos
+      if (window._completeHomeLoader) window._completeHomeLoader();
     })
     .catch(function() {
       skeleton.style.display = "none";
+      // En caso de error también completamos el loader para no dejar al usuario bloqueado
+      if (window._completeHomeLoader) window._completeHomeLoader();
     });
 }
 
